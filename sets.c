@@ -81,8 +81,6 @@ INTERVALLIST *appendInterval(INTERVALLIST *i)
   return i;
 }
 
-/* Insert new element after <i>, returning */
-/* a reference to the new element.         */
 /* Copy values in <source> interval to <dest> interval */
 void cloneInterval(INTERVALLIST *dest, INTERVALLIST *source)
 {
@@ -226,9 +224,7 @@ void intersect(INTERVAL *dest, INTERVAL *i)
 
 }
 
-extern int R;
-
-INTERVAL *inverse(INTERVAL *i1)
+INTERVAL *inverse(INTERVAL *i1, double global_end)
 {
   INTERVALLIST *il,*result;
   INTERVAL *i;
@@ -249,14 +245,14 @@ INTERVAL *inverse(INTERVAL *i1)
   }
 
   while (pos<i1->size) {
-    if (il->end==(double)R/2.0) {
+    if (il->end >= global_end) {
       break;
     }
     result = appendInterval(result);
     size++;
     result->start = il->end;
     if (il->next->start < il->end) 
-      result->end = R/2.0;
+      result->end = global_end;
     else
       result->end = il->next->start;
     il=il->next;

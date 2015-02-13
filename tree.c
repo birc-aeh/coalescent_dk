@@ -24,13 +24,6 @@ bool probCoalescens(double k)
   return (drand48()<sz);
 }
 
-double computeA(INTERVAL *i)
-{
-  if (i->size==0)
-    return 0.0;
-  return (getYn(i)-getX1(i));
-}
-
 double exponen(double f)
 {
   return -log(drand48())/f;
@@ -68,7 +61,6 @@ void makeCoalescensNode(double newTime)
   s->daughter = s2;
   s->daughterID = edgeCounter++;
   s->intervals = uniteNoTerm(s1->intervals,s2->intervals);
-  s->A = computeA(s->intervals);
   s->Time = newTime;
 
   s1->father = s;
@@ -81,13 +73,12 @@ void makeCoalescensNode(double newTime)
   if (s->matleft>=0.0) {
 
     if (last_make!=NULL) {
-      i = inverse(last_make);
+      i = inverse(last_make, (double)R/2.0);
       intersect(i,uniteNoTerm(s1->intervals,s2->intervals));
-      prettyInterval(i);
     } else {
       i = uniteNoTerm(s1->intervals,s2->intervals);
-      prettyInterval(i);
     }
+    prettyInterval(i);
   }
 }
 
@@ -134,9 +125,6 @@ void makeSelectionNode(double newTime)
   
   r->P = 0.0;
 
-  s1->A = computeA(s1->intervals);
-  s2->A = computeA(s2->intervals);
-
   putSequence(s1);
   putSequence(s2);
 
@@ -155,7 +143,6 @@ void build(void)
 
   for (i=0; i<num_ini_seq; i++) {
     s = newSequence();
-    s->A = (double)R/2.0;
     s->indegree = 0;
     s->outdegree = 0;
     s->intervals = initInterval(0,(double)R/2.0);
@@ -202,7 +189,6 @@ INTERVAL *the_intervals;
 void intersectOne(SEQUENCE *s)
 {
   intersect(s->intervals,the_intervals);  
-  s->A = computeA(s->intervals);  
 }
 
 void intersectAll(INTERVAL *i)
