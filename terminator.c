@@ -238,8 +238,6 @@ INTERVAL *makeIntervals(void)
   return i;
 }
 
-debug double newTime;
-  
 INTERVAL *last_make;
 
 double updateOneK(void)

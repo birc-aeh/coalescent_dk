@@ -10,9 +10,6 @@ void putSequence(SEQUENCE *s);
 SEQUENCE *getSequence(int i);
 SEQUENCE *getSomeSequence(void);
 
-void recalculateA(void);
-void recalculateAllA(void);
-
 void traverseTopSeqs(void (*opr)(SEQUENCE *));
 
 /* private */

@@ -13,7 +13,6 @@ extern int RZ;
 
 extern double sumA;      /* The global A                           */
 extern int size;         /* Number of sequences to choose from (k) */
-extern double newTime;   /* Elapsed time (backwards)               */
 extern double exprate;
 
 SEQUENCE *rootTime;       /* Base of timeline */
@@ -21,7 +20,7 @@ static SEQUENCE *lastTime; /* Timeline */
 
 extern double selection_rate;
 
-bool probCoalescens(void)
+bool probCoalescens(int size)
 {
   double sz;
 
@@ -45,7 +44,7 @@ double exponen(double f)
 extern INTERVAL *last_make;
 static int edgeCounter = 0;
 
-void makeCoalescensNode(void)
+void makeCoalescensNode(double newTime)
 {
   SEQUENCE *s,*s1,*s2;
   INTERVAL *i;
@@ -97,7 +96,7 @@ void makeCoalescensNode(void)
   }
 }
 
-void makeSelectionNode(void)
+void makeSelectionNode(double newTime)
 {
   SEQUENCE *s,*r,*s1,*s2;
 
@@ -155,7 +154,7 @@ void build(void)
   int i;
   
   rootTime = lastTime = NULL;
-  newTime = 0.0;
+  double newTime = 0.0;
   initTerminator();
   initSequencePool();
 
@@ -191,12 +190,12 @@ void build(void)
       exit(1);
     }
 
-    if (probCoalescens()) {
-      makeCoalescensNode();
+    if (probCoalescens(size)) {
+      makeCoalescensNode(newTime);
       i++;
     }
     else {
-      makeSelectionNode();
+      makeSelectionNode(newTime);
       i++;
     }
   }
@@ -216,5 +215,4 @@ void intersectAll(INTERVAL *i)
   if (i==NULL) return;
   the_intervals = i;
   traverseTopSeqs(intersectOne);
-  recalculateAllA();
 }
