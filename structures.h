@@ -54,11 +54,5 @@ typedef struct INTERVALLIST {
   struct INTERVALLIST *prev,*next;
 } INTERVALLIST;
 
-typedef struct REALTREE {
-  double time;
-  int number;
-  struct REALTREE *left,*right;
-} REALTREE;
-
 
 #endif
