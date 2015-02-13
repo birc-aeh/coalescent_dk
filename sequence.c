@@ -66,12 +66,3 @@ SEQUENCE *getSomeSequence(void)
     return NULL;
 }
 
-/* Iterate through the sequences in the structure, */
-/* calling function <opr> with each sequence.      */
-void traverseTopSeqs(void (*opr)(SEQUENCE *))
-{
-  int i;
-  for (i = 0; i < seqs_len; i++)
-    opr(seqs[i]);
-}
-

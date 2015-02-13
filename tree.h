@@ -4,7 +4,5 @@
 #include "sets.h"
 
 void build(void);
-void intersectAll(INTERVAL *i);
-
 
 #endif

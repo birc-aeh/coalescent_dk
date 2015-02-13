@@ -166,17 +166,3 @@ void build(void)
   }
 }
 
-
-INTERVAL *the_intervals;
-
-void intersectOne(SEQUENCE *s)
-{
-  intersect(s->intervals,the_intervals);  
-}
-
-void intersectAll(INTERVAL *i)
-{
-  if (i==NULL) return;
-  the_intervals = i;
-  traverseTopSeqs(intersectOne);
-}
