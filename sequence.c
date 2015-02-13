@@ -42,26 +42,16 @@ void putSequence(SEQUENCE *s)
   seqs_len += 1;
 }
 
-/* Get sequence at index i - move the last sequence */ 
-/* in the structure to the freed slot.              */
-SEQUENCE *getSequence(int i)
-{
-  if (i >= seqs_len) {
-    fprintf(stderr,"Index out of range: getSequence(%i)\n",i);
-    exit(1);
-  }
-
-  SEQUENCE *result = seqs[i];
-  seqs[i] = seqs[seqs_len-1];
-  seqs_len -= 1;
-  return result;
-}  
-
 /* Get a totally random sequence. */
 SEQUENCE *getSomeSequence(void)
 {
-  if (seqs_len>0)
-    return getSequence(rand()%seqs_len);
+  if (seqs_len>0) {
+    int i = rand()%seqs_len;
+    SEQUENCE *result = seqs[i];
+    seqs[i] = seqs[seqs_len-1];
+    seqs_len -= 1;
+    return result;
+  }
   else
     return NULL;
 }

@@ -6,7 +6,6 @@
 SEQUENCE *newSequence(void);
 void putSequence(SEQUENCE *s);
 
-SEQUENCE *getSequence(int i);
 SEQUENCE *getSomeSequence(void);
 
 #endif
