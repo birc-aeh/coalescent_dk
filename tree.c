@@ -4,7 +4,6 @@
 #include "tree.h"
 #include "structures.h"
 #include "sequence.h"
-#include "terminator.h"
 
 extern int num_ini_seq;   /* Number of initial sequences */
 extern int R;             /* Rekombination-rate */
@@ -124,7 +123,6 @@ void build(void)
   
   rootTime = lastTime = NULL;
   double newTime = 0.0;
-  initTerminator();
   initSequencePool();
 
   for (i=0; i<num_ini_seq; i++) {

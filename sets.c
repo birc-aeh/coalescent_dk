@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "sets.h"
-#include "terminator.h"
 
 static double fmin(double a,double b)
 {

@@ -5,7 +5,6 @@
 #include "tree.h"
 #include "sequence.h"
 #include "sets.h"
-#include "terminator.h"
 #include "arguments.h"
 #include "selection.h"
 
