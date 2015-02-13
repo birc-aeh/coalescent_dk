@@ -93,50 +93,6 @@ static void dumpStructure(void)
 
 }
 
-static void dumpDot(char *filename)
-{
-  SEQUENCE *s;
-  int edgeCounter;
-  FILE *f;
-  int incoming;
-
-  s = rootTime;
-  edgeCounter = 0;
-  f = fopen(filename,"w");
-  if (!f) return;
-
-  fprintf(f,"digraph STRUCT {\n");
-  fprintf(f,"size=\"7,8\";\n");
-
-  while (s) {
-    fprintf(f,"N%d [label=\"%d\"];\n",s->ID,s->ID);
-    incoming = 0;
-
-    switch (s->indegree) {      
-    case 0:
-      break;
-    case 1:
-      incoming = (s->son->mother == s);
-      fprintf(f,"N%d -> N%d [label=\"%c%c\"];\n",s->son->ID,s->ID,incoming?'I':' ',s->flipson?'x':' ');
-      break;
-    case 2:      
-      incoming = (s->son->mother == s);
-      fprintf(f,"N%d -> N%d [label=\"%c%c\"];\n",s->son->ID,s->ID,incoming?'I':' ',s->flipson?'x':' ');
-      incoming = (s->daughter->mother == s);
-      fprintf(f,"N%d -> N%d [label=\"%c%c\"];\n",
-	      s->daughter->ID,s->ID,incoming?'I':' ',s->flipdaughter?'x':' ');
-      break;
-    }
-    s = s->nextTime;
-  }
-
-  fprintf(f,"}\n");
-  fclose(f);
-
-}
-
-
-
 static void eraseIncoming(SEQUENCE *s)
 {
   s->mother->indegree--;
@@ -337,11 +293,10 @@ static void dumpMutations(SEQUENCE *s)
 
 static int poissonDist(double mean)
 {
-  double U,Sum,Nom,Den;
+  double U,Nom,Den;
   int i;
 
   U = drand48()/exp(-mean);
-  Sum = 0.0;
   Nom = 1.0;
   Den = 1.0;
 
@@ -481,7 +436,6 @@ void makeSelection(void)
   printf("\nMU");
   dumpMutations(s);
   printf("\n");
-/*    dumpDot("s1.dot"); */
 
   reverseTime();
   trimSelection(s);
@@ -492,11 +446,9 @@ void makeSelection(void)
   printf("\n");  
   removeDummies(&s);
 
-/*    dumpDot("s2.dot"); */
 
   extractTree(s);
   removeDummies(&s);
-/*    dumpDot("s3.dot"); */
 
   printf("ME");
   dumpEdgesInTree(s);
