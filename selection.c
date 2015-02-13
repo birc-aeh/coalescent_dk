@@ -124,7 +124,7 @@ static void eraseContinuing(SEQUENCE *s)
 }
 
 
-static int isFlip(SEQUENCE *child, SEQUENCE *parent)
+static int isMutated(SEQUENCE *child, SEQUENCE *parent)
 {
   if (parent->son == child)
     return parent->son_is_mutated;
@@ -139,7 +139,7 @@ static int isFlip(SEQUENCE *child, SEQUENCE *parent)
 
 static int getType(SEQUENCE *child, SEQUENCE *parent)
 {
-  return isFlip(child,parent)?!parent->type:parent->type;
+  return isMutated(child,parent)? !parent->type : parent->type;
 }
 
 
