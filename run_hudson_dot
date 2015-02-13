@@ -1,0 +1,40 @@
+#!/usr/local/bin/perl
+
+$argv = "";
+foreach $arg (@ARGV) {
+    $argv = "$argv $arg";
+}
+
+open(hudson,"./hudson $argv |") or die;
+
+$inode = 0;
+$iedge = 0;
+
+while (<hudson>) {
+    chomp;
+    /^N / and $node[$inode++] = $' and next;
+    /^E / and $edge[$iedge++] = $' and next;
+    die "Bad response from hudson : $_\n";
+}
+
+close(hudson);
+
+print "graph G1 {\n";
+print "size=\"8,8\";\n";
+foreach $n (@node) {
+    ($id,$col,$time,$info) = split(/\|/,$n);
+
+    if ($col == 0) {
+	print "A$id [label=\"$id\"];\n";
+    } else {
+	print "A$id [label=\"$id\", shape=\"box\"];\n";
+    }
+    #print $n,"|";
+}
+
+foreach $e (@edge) {
+    ($src,$dst) = split(/\|/,$e);
+    print "A$src -- A$dst;\n";
+}
+
+print "}\n";

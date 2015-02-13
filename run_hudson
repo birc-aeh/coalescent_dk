@@ -1,0 +1,34 @@
+#!/usr/local/bin/perl
+
+$argv = "";
+foreach $arg (@ARGV) {
+    $argv = "$argv $arg";
+}
+
+open(hudson,"./hudson $argv |") or (print "could not execute\n" and exit 0);
+
+$inode = 0;
+$iedge = 0;
+
+while (<hudson>) {
+    chomp;
+    /^N / and $node[$inode++] = $' and next;
+    /^E / and $edge[$iedge++] = $' and next;
+    die "Bad response from hudson : $_\n";
+}
+
+close(hudson);
+
+print "ok\n";
+
+foreach $n (@node) {
+    print $n,"|";
+}
+
+print "#";
+
+foreach $e (@edge) {
+    print $e,"|";
+}
+
+print "\n";
