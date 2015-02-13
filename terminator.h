@@ -8,11 +8,5 @@ void initTerminator(void);
 bool updateRecombination(double P);
 void updateCoalescens(double from, double to);
 double updateOneK(void);
-bool theEnd(void);
-
-
-void makeRealTree();
-
-void prettyTerm(void);
 
 #endif

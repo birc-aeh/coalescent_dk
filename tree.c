@@ -44,14 +44,6 @@ double exponen(double f)
   return -log(drand48())/f;
 }
 
-double getLegalPoint(INTERVAL *i)
-{
-  double x1,yn;
-  x1 = getX1(i);
-  yn = getYn(i);
-  return x1+(drand48()*(yn-x1));
-}
-
 extern INTERVAL *last_make;
 static int edgeCounter = 0;
 
