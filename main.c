@@ -5,7 +5,6 @@
 #include "tree.h"
 #include "sequence.h"
 #include "sets.h"
-#include "memory.h"
 #include "terminator.h"
 #include "arguments.h"
 #include "selection.h"
@@ -22,7 +21,6 @@ int main(int argc, char **argv)
 
 
   parseArguments(argc,argv);
-  initMemory();
 
   printf("Selection\n");
   
