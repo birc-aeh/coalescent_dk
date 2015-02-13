@@ -14,7 +14,6 @@ typedef struct SEQUENCE {
 
   double Time;
   double P;
-  double matleft;
 
   struct REALTREE *sub;
   //int seq_number;

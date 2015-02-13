@@ -7,6 +7,5 @@
 void initTerminator(void);
 bool updateRecombination(double P);
 void updateCoalescens(double from, double to);
-double updateOneK(void);
 
 #endif

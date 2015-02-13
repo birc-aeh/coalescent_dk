@@ -26,7 +26,6 @@ SEQUENCE *newSequence(void)
   result->reversed = false;
   result->count = 0;
   //result->y = -1;
-  result->matleft = -1.0;
 
   result->flipson = 0;
   result->flipdaughter = 0;

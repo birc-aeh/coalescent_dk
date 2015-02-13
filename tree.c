@@ -35,7 +35,6 @@ static int edgeCounter = 0;
 void makeCoalescensNode(double newTime)
 {
   SEQUENCE *s,*s1,*s2;
-  INTERVAL *i;
 
   s1 = getSomeSequence();
   s1->outdegree = 1;
@@ -67,19 +66,6 @@ void makeCoalescensNode(double newTime)
   s2->father = s;
 
   putSequence(s);
-
-  s->matleft = updateOneK();  
-
-  if (s->matleft>=0.0) {
-
-    if (last_make!=NULL) {
-      i = inverse(last_make, (double)R/2.0);
-      intersect(i,uniteNoTerm(s1->intervals,s2->intervals));
-    } else {
-      i = uniteNoTerm(s1->intervals,s2->intervals);
-    }
-    prettyInterval(i);
-  }
 }
 
 void makeSelectionNode(double newTime)
