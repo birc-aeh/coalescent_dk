@@ -99,7 +99,7 @@ static void eraseIncoming(SEQUENCE *s)
   if (s->mother->son == s) {
     s->mother->son = s->mother->daughter;
     s->mother->sonID = s->mother->daughterID;
-    s->mother->flipson = s->mother->flipdaughter;
+    s->mother->son_is_mutated = s->mother->daughter_is_mutated;
   }
 
   s->mother->daughter = NULL;
@@ -114,7 +114,7 @@ static void eraseContinuing(SEQUENCE *s)
   if (s->father->son == s) {
     s->father->son = s->father->daughter;
     s->father->sonID = s->father->daughterID;
-    s->father->flipson = s->father->flipdaughter;
+    s->father->son_is_mutated = s->father->daughter_is_mutated;
   }
   s->father->daughter = NULL;
 
@@ -127,10 +127,10 @@ static void eraseContinuing(SEQUENCE *s)
 static int isFlip(SEQUENCE *child, SEQUENCE *parent)
 {
   if (parent->son == child)
-    return parent->flipson;
+    return parent->son_is_mutated;
 
   if (parent->daughter == child)
-    return parent->flipdaughter;
+    return parent->daughter_is_mutated;
 
   fprintf(stderr,"Bad child\n");
   exit(1);
@@ -225,10 +225,10 @@ static double measureEdges(SEQUENCE *s)
     case 0:
       break;
     case 1:
-      res += s->Time-s->son->Time;
+      res += s->Time - s->son->Time;
       break;
     case 2:
-      res += (s->Time-s->son->Time)+(s->Time-s->daughter->Time);
+      res += (s->Time - s->son->Time)+(s->Time - s->daughter->Time);
       break;    
     }
     s = s->revTime;
@@ -246,15 +246,15 @@ static void placeMutation(SEQUENCE *s, double place)
     case 0:
       break;
     case 1:
-      place = place - (s->Time-s->son->Time);
-      if (place < 0.0) s->flipson = !s->flipson;
+      place = place - (s->Time - s->son->Time);
+      if (place < 0.0) s->son_is_mutated = !s->son_is_mutated;
       break;
     case 2:
-      place = place - (s->Time-s->son->Time);
-      if (place < 0.0) s->flipson = !s->flipson;
+      place = place - (s->Time - s->son->Time);
+      if (place < 0.0) s->son_is_mutated = !s->son_is_mutated;
 
-      place = place - (s->Time-s->daughter->Time);
-      if (place < 0.0) s->flipdaughter = !s->flipdaughter;
+      place = place - (s->Time - s->daughter->Time);
+      if (place < 0.0) s->daughter_is_mutated = !s->daughter_is_mutated;
       break;
     }
     s = s->revTime;
@@ -274,11 +274,11 @@ static void dumpMutations(SEQUENCE *s)
     case 0:
       break;
     case 1:
-      if (s->flipson) printf(" %d",s->sonID);
+      if (s->son_is_mutated) printf(" %d",s->sonID);
       break;
     case 2:
-      if (s->flipson) printf(" %d",s->sonID);
-      if (s->flipdaughter) printf(" %d",s->daughterID);
+      if (s->son_is_mutated) printf(" %d",s->sonID);
+      if (s->daughter_is_mutated) printf(" %d",s->daughterID);
       break;
     default:
       break;

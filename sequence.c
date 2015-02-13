@@ -17,8 +17,8 @@ SEQUENCE *newSequence(void)
   result->Time = 0.0;
   result->nextTime = NULL;
 
-  result->flipson = 0;
-  result->flipdaughter = 0;
+  result->son_is_mutated = 0;
+  result->daughter_is_mutated = 0;
 
   result->sonID = -1;
   result->daughterID = -1;

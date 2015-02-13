@@ -25,7 +25,7 @@ typedef struct SEQUENCE {
   struct SEQUENCE *nextTime;
   struct SEQUENCE *revTime;
 
-  int flipson, flipdaughter;
+  int son_is_mutated, daughter_is_mutated;
   int sonID, daughterID;
   int type;
 
