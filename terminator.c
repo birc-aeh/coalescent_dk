@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "terminator.h"
-#include "memory.h"
 #include "tree.h"
 #include "sets.h"
 
