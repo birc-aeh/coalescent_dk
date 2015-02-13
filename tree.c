@@ -6,8 +6,6 @@
 #include "sequence.h"
 
 extern int num_ini_seq;   /* Number of initial sequences */
-extern int R;             /* Rekombination-rate */
-extern int RZ;
 
 extern int seqs_len;      /* Number of sequences to choose from (k) */
 
@@ -140,12 +138,7 @@ void build(void)
   while (seqs_len>1) {
     double k = (double)seqs_len;
 
-    if (RZ) {
-      newTime = newTime + exponen(k*(k-1.0)/2.0+k*selection_rate);
-    } else {
-      fprintf(stderr,"Rho must be zero!!\n");
-      exit(1);
-    }
+    newTime = newTime + exponen(k*(k-1.0)/2.0+k*selection_rate);
 
     if (probCoalescens(k)) {
       makeCoalescensNode(newTime);

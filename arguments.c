@@ -6,8 +6,6 @@
 #include "arguments.h"
 
 int num_ini_seq;      /* Number of initial sequences            */
-int R;                /* Recombination rate                     */
-int RZ;               /* Flag if R is zero                      */
 
 double selection_rate;
 double M;
@@ -15,9 +13,6 @@ double M;
 void parseArguments(int argc, char **argv)
 {
   char *c;
-
-  R = 1;
-  RZ = 1;
   num_ini_seq = 5;
   int seed = time(NULL);
 
