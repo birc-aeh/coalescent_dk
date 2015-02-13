@@ -1,6 +1,6 @@
 
 CC = gcc
-CFLAGS = -O3 -Wall
+CFLAGS = -O3 -Wall -m32
 #CFLAGS = -Wall -g
 
 HEADERS = structures.h sequence.h tree.h arguments.h selection.h
