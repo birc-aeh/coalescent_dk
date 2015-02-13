@@ -99,8 +99,6 @@ void makeSelectionNode(double newTime)
   r->father = s1;
   r->mother = s2;
   
-  r->P = 0.0;
-
   putSequence(s1);
   putSequence(s2);
 

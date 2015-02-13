@@ -13,10 +13,6 @@ typedef struct SEQUENCE {
   int ID;
 
   double Time;
-  double P;
-
-  struct REALTREE *sub;
-  //int seq_number;
 
   int indegree;
   int outdegree;
