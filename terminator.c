@@ -254,11 +254,3 @@ double updateOneK(void)
   return -1.0;
 }
 
-extern SEQUENCE *rootTime;
-
-void dumpTree(termList *t)
-{
-  printf("%f|",t->z);
-  printf("\n");
-}
-
