@@ -11,7 +11,7 @@ extern int num_ini_seq;   /* Number of initial sequences */
 extern int R;             /* Rekombination-rate */
 extern int RZ;
 
-extern int size;         /* Number of sequences to choose from (k) */
+extern int seqs_len;      /* Number of sequences to choose from (k) */
 extern double exprate;
 
 SEQUENCE *rootTime;       /* Base of timeline */
@@ -176,17 +176,17 @@ void build(void)
   }
 
   i = num_ini_seq;
-  while (size>1) {
+  while (seqs_len>1) {
+    double k = (double)seqs_len;
 
     if (RZ) {
-      newTime = newTime + exponen((double)size*((double)size-1.0)/2.0+
-				  (double)size*selection_rate);
+      newTime = newTime + exponen(k*(k-1.0)/2.0+k*selection_rate);
     } else {
       fprintf(stderr,"Rho must be zero!!\n");
       exit(1);
     }
 
-    if (probCoalescens((double)size)) {
+    if (probCoalescens(k)) {
       makeCoalescensNode(newTime);
       i++;
     }
