@@ -123,7 +123,6 @@ void build(void)
   
   rootTime = lastTime = NULL;
   double newTime = 0.0;
-  initSequencePool();
 
   for (i=0; i<num_ini_seq; i++) {
     s = newSequence();

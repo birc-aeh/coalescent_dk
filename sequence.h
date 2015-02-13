@@ -3,7 +3,6 @@
 
 #include "structures.h"
 
-void initSequencePool(void);
 SEQUENCE *newSequence(void);
 void putSequence(SEQUENCE *s);
 
