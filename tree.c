@@ -28,7 +28,6 @@ double exponen(double f)
   return -log(drand48())/f;
 }
 
-extern INTERVAL *last_make;
 static int edgeCounter = 0;
 
 void makeCoalescensNode(double newTime)
