@@ -118,7 +118,6 @@ void build(void)
     s->indegree = 0;
     s->outdegree = 0;
     s->Time = 0.0;
-    s->count = 1;
 
     putSequence(s);
 

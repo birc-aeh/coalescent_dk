@@ -16,9 +16,6 @@ SEQUENCE *newSequence(void)
   result->ID = ID++;
   result->Time = 0.0;
   result->nextTime = NULL;
-  result->reversed = false;
-  result->count = 0;
-  //result->y = -1;
 
   result->flipson = 0;
   result->flipdaughter = 0;
