@@ -145,47 +145,23 @@ static int getType(SEQUENCE *child, SEQUENCE *parent)
 
 static void trimSelection(SEQUENCE *r)
 {
-  int kind;
-
   while (r) {
 
-    while (1) {
-      if (r->outdegree==1) {
-	r->type = getType(r,r->father);
-	break;
-      }
+    if (r->outdegree == 1) {
+      r->type = getType(r, r->father);
+    }
+    else if (r->indegree == 1 && r->outdegree == 2) {
+      int kind_m = getType(r, r->mother);
+      int kind_f = getType(r, r->father);
 
-      if (r->indegree==1 && r->outdegree==2) {
-	kind  = getType(r,r->mother) << 1;
-	kind |= getType(r,r->father);
-
-	switch (kind) {
-	case 0:
-	  eraseIncoming(r);
-	  r->type = 0;
-	  break;
-	case 1:
-	  eraseIncoming(r);
-	  r->type = 1;
-	  break;
-	case 2:
-	case 3:	
-	  eraseContinuing(r);
-	  r->type = 1;
-	  break;
-	default:
-	  fprintf(stderr,"Bad kind %d\n",kind);
-	  exit(1);
-	}
-	break;
-      }
-
-      if (r->father == NULL) {
-	r->type = 1;
-	break;
-      }
-
-      break;
+      r->type = kind_m | kind_f;
+      if (kind_m)
+        eraseContinuing(r);
+      else
+        eraseIncoming(r);
+    }
+    else if (r->father == NULL) {
+      r->type = 1;
     }
 
     r = r->revTime;
