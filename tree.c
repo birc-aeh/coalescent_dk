@@ -10,7 +10,6 @@ extern int R;             /* Rekombination-rate */
 extern int RZ;
 
 extern int seqs_len;      /* Number of sequences to choose from (k) */
-extern double exprate;
 
 SEQUENCE *rootTime;       /* Base of timeline */
 static SEQUENCE *lastTime; /* Timeline */
