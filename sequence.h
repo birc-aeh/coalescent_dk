@@ -12,7 +12,4 @@ SEQUENCE *getSomeSequence(void);
 
 void traverseTopSeqs(void (*opr)(SEQUENCE *));
 
-/* private */
-void handleSeq(SEQUENCE *s, void (*opr)(SEQUENCE *));
-
 #endif

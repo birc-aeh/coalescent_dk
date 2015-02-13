@@ -15,7 +15,6 @@ typedef struct SEQUENCE {
   double A;
   double Time;
   double P;
-  bool visited;
   double matleft;
 
   struct REALTREE *sub;

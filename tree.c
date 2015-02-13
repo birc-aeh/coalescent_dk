@@ -11,7 +11,6 @@ extern int num_ini_seq;   /* Number of initial sequences */
 extern int R;             /* Rekombination-rate */
 extern int RZ;
 
-extern double sumA;      /* The global A                           */
 extern int size;         /* Number of sequences to choose from (k) */
 extern double exprate;
 
@@ -20,12 +19,9 @@ static SEQUENCE *lastTime; /* Timeline */
 
 extern double selection_rate;
 
-bool probCoalescens(int size)
+bool probCoalescens(double k)
 {
-  double sz;
-
-  sz = (double)size;
-  sz = (sz*(sz-1.0))/(sz*(sz-1.0)+sz*selection_rate);
+  double sz = (k*(k-1.0))/(k*(k-1.0)+k*selection_rate);
   return (drand48()<sz);
 }
 
@@ -190,7 +186,7 @@ void build(void)
       exit(1);
     }
 
-    if (probCoalescens(size)) {
+    if (probCoalescens((double)size)) {
       makeCoalescensNode(newTime);
       i++;
     }
