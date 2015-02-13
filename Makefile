@@ -12,10 +12,7 @@ all: $(HEADERS) $(OBJS)
 	chmod 755 $(TARGET)
 
 clean:
-	rm -f $(OBJS) $(HOGOBJS) *~
-
-depend:
-	depend $(OBJS)
+	rm -f $(OBJS) *~
 
 
 # DO NOT ERASE THIS COMMENT
