@@ -36,19 +36,6 @@ typedef struct SEQUENCE {
   int sonID, daughterID;
   int type;
 
-  struct INTERVAL *intervals;
 } SEQUENCE;
-
-
-typedef struct INTERVAL {
-  int size;
-  struct INTERVALLIST *list;
-} INTERVAL;
-
-typedef struct INTERVALLIST {
-  double start,end;
-  struct INTERVALLIST *prev,*next;
-} INTERVALLIST;
-
 
 #endif

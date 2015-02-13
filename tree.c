@@ -57,7 +57,6 @@ void makeCoalescensNode(double newTime)
   s->sonID = edgeCounter++;
   s->daughter = s2;
   s->daughterID = edgeCounter++;
-  s->intervals = uniteNoTerm(s1->intervals,s2->intervals);
   s->Time = newTime;
 
   s1->father = s;
@@ -77,7 +76,6 @@ void makeSelectionNode(double newTime)
   r->indegree = 1;
   r->outdegree = 2;
   r->son = s;
-  r->intervals = copyIntervals(s->intervals);
   s->father = r;
 
   if (lastTime==NULL) {
@@ -103,9 +101,6 @@ void makeSelectionNode(double newTime)
 
   r->father = s1;
   r->mother = s2;
-  s1->intervals = copyIntervals(r->intervals);
-  s2->intervals = copyIntervals(r->intervals);
-
   
   r->P = 0.0;
 
@@ -127,7 +122,6 @@ void build(void)
     s = newSequence();
     s->indegree = 0;
     s->outdegree = 0;
-    s->intervals = initInterval(0,(double)R/2.0);
     s->Time = 0.0;
     s->count = 1;
 

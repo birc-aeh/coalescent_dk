@@ -4,7 +4,6 @@
 #include "structures.h"
 #include "tree.h"
 #include "sequence.h"
-#include "sets.h"
 #include "arguments.h"
 #include "selection.h"
 
