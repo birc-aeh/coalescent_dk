@@ -44,12 +44,10 @@ static void pointThrough(SEQUENCE *s)
 
 static void dumpStructure(void)
 {
-  /* The original probably has a bug here. children 1 outputs 2 and children 2
-   * outputs 1 - I'm trying to keep identical output though */
-  int extra_field[] = {0,2,1};
+  int color[] = {0,2,1};
   SEQUENCE *s = rootTime;
   while (s) {
-    printf("N %i|%i|%f|", s->ID, extra_field[s->children], s->Time);
+    printf("N %i|%i|%f|", s->ID, color[s->children], s->Time);
     printf("Time:%f\n",s->Time);
     if (s->children > 0)
       printf("E %d|%d|%d\n",s->sonID,s->son->ID,s->ID);
