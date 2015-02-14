@@ -23,7 +23,7 @@ typedef struct SEQUENCE {
   struct SEQUENCE *daughter;
 
   struct SEQUENCE *nextTime;
-  struct SEQUENCE *revTime;
+  struct SEQUENCE *prevTime;
 
   int son_is_mutated, daughter_is_mutated;
   int sonID, daughterID;

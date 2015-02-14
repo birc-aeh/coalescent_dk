@@ -41,7 +41,7 @@ static void pointThrough(SEQUENCE *s)
 	s->daughter->children==1 && s->daughter->parents==1) {
       compress_path(s, s->daughter, &s->daughter);
     }
-    s = s->revTime;
+    s = s->prevTime;
   }
 }
 
@@ -133,7 +133,7 @@ static void trimSelection(SEQUENCE *r)
       r->type = 1;
     }
 
-    r = r->revTime;
+    r = r->prevTime;
   }
   
 }
@@ -168,7 +168,7 @@ static double measureEdges(SEQUENCE *s)
       res += s->Time - s->son->Time;
     if (s->children > 1)
       res += s->Time - s->daughter->Time;
-    s = s->revTime;
+    s = s->prevTime;
   }
   return res;
 }
@@ -185,7 +185,7 @@ static void placeMutation(SEQUENCE *s, double place)
       place = place - (s->Time - s->daughter->Time);
       if (place < 0.0) s->daughter_is_mutated = !s->daughter_is_mutated;
     }
-    s = s->revTime;
+    s = s->prevTime;
   }
 }
 
@@ -197,7 +197,7 @@ static void dumpMutations(SEQUENCE *s)
       printf(" %d",s->sonID);
     if (s->children > 1 && s->daughter_is_mutated)
       printf(" %d",s->daughterID);
-    s = s->revTime;
+    s = s->prevTime;
   }
 }
 
@@ -243,10 +243,10 @@ void reverseTime(void)
 {
   SEQUENCE *s = rootTime;
 
-  s->revTime = NULL;
+  s->prevTime = NULL;
 
   while (s->nextTime != NULL) {
-    s->nextTime->revTime = s;
+    s->nextTime->prevTime = s;
     s = s->nextTime;   
   }
 }
@@ -312,7 +312,7 @@ void dumpType(SEQUENCE *s, int t)
 {
   while (s) {
     if (s->type == t) printf(" %d",s->ID);
-    s = s->revTime;
+    s = s->prevTime;
   }
 }
 
