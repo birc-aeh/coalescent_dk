@@ -224,19 +224,10 @@ static void placeMutation(SEQUENCE *s, double place)
 static void dumpMutations(SEQUENCE *s)
 {
   while (s) {
-    switch (s->indegree) {
-    case 0:
-      break;
-    case 1:
-      if (s->son_is_mutated) printf(" %d",s->sonID);
-      break;
-    case 2:
-      if (s->son_is_mutated) printf(" %d",s->sonID);
-      if (s->daughter_is_mutated) printf(" %d",s->daughterID);
-      break;
-    default:
-      break;
-    }
+    if (s->indegree > 0 && s->son_is_mutated)
+      printf(" %d",s->sonID);
+    if (s->indegree > 1 && s->daughter_is_mutated)
+      printf(" %d",s->daughterID);
     s = s->revTime;
   }
 }
