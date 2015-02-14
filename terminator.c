@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "terminator.h"
-#include "memory.h"
 #include "tree.h"
 #include "sets.h"
 
@@ -40,7 +39,7 @@ int max(int a, int b)
 void prependElement(termList *t,double z)
 {
   termList *n;
-  n = NEW(termList);
+  n = malloc(sizeof(termList));
   n->prev = t->prev;
   n->prev->next = n;
   n->next = t;
@@ -54,7 +53,7 @@ void prependElement(termList *t,double z)
 void appendElement(termList *t,double z)
 {
   termList *n;
-  n = NEW(termList);
+  n = malloc(sizeof(termList));
   n->next = NULL;
   n->prev = t;
   n->prev->next = n;
@@ -67,20 +66,20 @@ void appendElement(termList *t,double z)
 void initTerminator(void)
 {
   int i;
-  root = NEW(termList);
+  root = malloc(sizeof(termList));
   root->z = 0.0;
   root->k = num_ini_seq;
   root->next = NULL;
   root->prev = NULL;
 
-  number_with_size = Malloc(sizeof(int)*(num_ini_seq+1));
+  number_with_size = malloc(sizeof(int)*(num_ini_seq+1));
   for (i=0; i<num_ini_seq; number_with_size[i++]=0);
   number_with_size[num_ini_seq] = 1;
   roof = 1;
   some_k_became_one = false;
 
   hsize = (R/2)+1;
-  htable = Malloc(hsize*sizeof(termList *));
+  htable = malloc(hsize*sizeof(termList *));
   for (i=0; i<hsize; i++) 
     htable[i] = NULL;
   htable[0] = root;
@@ -112,7 +111,7 @@ static jumpList *appendJumpElement(jumpList *jl)
 {
   jumpList *tmp;
 
-  tmp = NEW(jumpList);
+  tmp = malloc(sizeof(jumpList));
   tmp->from = tmp->to = NULL;
 
   if (jl==NULL) {
@@ -223,7 +222,7 @@ INTERVAL *makeIntervals(void)
 
   if (size==0) return NULL;
 
-  il = Malloc(sizeof(INTERVALLIST)*size);
+  il = malloc(sizeof(INTERVALLIST)*size);
   jl=jlist;
   j=0;
   if (root!=jl->from) {
@@ -250,7 +249,7 @@ INTERVAL *makeIntervals(void)
     il[j].prev = &il[j-1];
   il[0].prev = &il[size-1];
 
-  i = NEW(INTERVAL);
+  i = malloc(sizeof(INTERVAL));
   i->size = size;
   i->list = il;
 
@@ -377,7 +376,7 @@ REALTREE *makeSub(void)
 {
   REALTREE *result;
 
-  result = NEW(REALTREE);
+  result = malloc(sizeof(REALTREE));
   result->left = 0;
   result->right = 0;
   result->time = 0.0;

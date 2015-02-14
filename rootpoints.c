@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "rootpoints.h"
-#include "memory.h"
 
 typedef struct RPOINT {
   double from,to;
@@ -26,7 +25,7 @@ void addRootPoint(INTERVAL *i, SEQUENCE *s)
   
   l = i->list;
   for (j=0; j<i->size; j++) {
-    new = NEW(RPOINT);
+    new = malloc(sizeof(RPOINT));
     new->point = s;
     new->from = l->start;
     new->to = l->end;
@@ -77,7 +76,7 @@ void sortRootPoints(void)
     p=p->next; 
   }
 
-  array = Malloc(sizeof(RPOINT *)*size);
+  array = malloc(sizeof(RPOINT *)*size);
 
   p = root;
   size=0;

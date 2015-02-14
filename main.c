@@ -5,7 +5,6 @@
 #include "tree.h"
 #include "sequence.h"
 #include "sets.h"
-#include "memory.h"
 #include "terminator.h"
 #include "arguments.h"
 
@@ -16,12 +15,7 @@ extern int seed;
 
 int main(int argc, char **argv) 
 {
-/*    int i,max,index; */
-/*    FILE *f; */
-
-
   parseArguments(argc,argv);
-  initMemory();
 
   printf("L 0 Initial\n");
   printf("L 1 Coalescent\n");

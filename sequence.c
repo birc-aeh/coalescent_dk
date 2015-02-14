@@ -2,7 +2,6 @@
 #include <stdio.h>
 
 #include "sequence.h"
-#include "memory.h"
 #include "sets.h"
 
 extern int alloc_size;
@@ -27,8 +26,8 @@ void initSequencePool(void)
   size = 0;
   flipflop = false;
   
-  root = last = NEW(SeqArrayPointer);
-  root->array = Malloc(alloc_size*sizeof(SEQUENCE *));
+  root = last = malloc(sizeof(SeqArrayPointer));
+  root->array = malloc(alloc_size*sizeof(SEQUENCE *));
   root->thisA = 0.0;
   root->next = NULL;
   root->prev = root;
@@ -40,7 +39,7 @@ SEQUENCE *newSequence(void)
   static int ID = 0;
 
   SEQUENCE *result;
-  result = NEW(SEQUENCE);
+  result = malloc(sizeof(SEQUENCE));
   result->ID = ID++;
   result->visited = flipflop;
   result->Time = 0.0;
@@ -63,8 +62,8 @@ void putSequence(SEQUENCE *s)
 
   if (size%alloc_size==0 && size>0) {
     if (last->next==NULL) {
-      last->next = NEW(SeqArrayPointer);
-      last->next->array = Malloc(alloc_size*sizeof(SEQUENCE *));
+      last->next = malloc(sizeof(SeqArrayPointer));
+      last->next->array = malloc(alloc_size*sizeof(SEQUENCE *));
       for (i=0; i<alloc_size; i++)
 	last->next->array[i] = NULL;
       last->next->thisA = 0.0;

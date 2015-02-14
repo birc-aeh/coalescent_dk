@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <math.h>
 #include "tree.h"
-#include "memory.h"
 #include "structures.h"
 #include "sequence.h"
 #include "terminator.h"

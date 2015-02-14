@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "sets.h"
-#include "memory.h"
 #include "terminator.h"
 
 static double fmin(double a,double b)
@@ -18,7 +17,7 @@ static double fmax(double a, double b)
 INTERVAL *initInterval(double x1, double y1)
 {
   INTERVAL *result;
-  result = NEW(INTERVAL);
+  result = malloc(sizeof(INTERVAL));
   result->size = 1;
   result->list = appendInterval(NULL);
   result->list->start = x1;
@@ -29,7 +28,7 @@ INTERVAL *initInterval(double x1, double y1)
 INTERVAL *emptyInterval(void)
 {
   INTERVAL *result;
-  result = NEW(INTERVAL);
+  result = malloc(sizeof(INTERVAL));
   result->size = 0;
   return result;
 }
@@ -41,7 +40,7 @@ INTERVAL *copyIntervals(INTERVAL *i)
   INTERVALLIST *ln,*lo;
   int j;
 
-  new = NEW(INTERVAL);
+  new = malloc(sizeof(INTERVAL));
   new->size = i->size;
   lo = i->list;
   ln = NULL;
@@ -76,7 +75,7 @@ INTERVALLIST *appendInterval(INTERVALLIST *i)
 {
   if (i!=NULL) {
     INTERVALLIST *new;
-    new = NEW(INTERVALLIST);
+    new = malloc(sizeof(INTERVALLIST));
     new->next = i->next;
     new->prev = i;
     i->next = new;
@@ -84,7 +83,7 @@ INTERVALLIST *appendInterval(INTERVALLIST *i)
     i = new;
   } 
   else {
-    i = NEW(INTERVALLIST);
+    i = malloc(sizeof(INTERVALLIST));
     i->next = i->prev = i;
   }
   return i;
@@ -96,7 +95,7 @@ INTERVALLIST *prependInterval(INTERVALLIST *i)
 {
   if (i!=NULL) {
     INTERVALLIST *new;
-    new = NEW(INTERVALLIST);
+    new = malloc(sizeof(INTERVALLIST));
     new->next = i;
     new->prev = i->prev;
     i->prev = new;
@@ -104,7 +103,7 @@ INTERVALLIST *prependInterval(INTERVALLIST *i)
     i = new;
   }
   else {
-    i = NEW(INTERVALLIST);
+    i = malloc(sizeof(INTERVALLIST));
     i->next = i->prev = i;
   }
   return i;
@@ -216,7 +215,7 @@ INTERVAL *unite(INTERVAL *i1, INTERVAL *i2)
     pos2++;
   }
 
-  i = NEW(INTERVAL);
+  i = malloc(sizeof(INTERVAL));
   i->size = size;
   i->list = (result==NULL ? NULL:result->next);
 
@@ -296,7 +295,7 @@ INTERVAL *uniteNoTerm(INTERVAL *i1, INTERVAL *i2)
     pos2++;
   }
 
-  i = NEW(INTERVAL);
+  i = malloc(sizeof(INTERVAL));
   i->size = size;
   i->list = (result==NULL ? NULL:result->next);
 
@@ -368,7 +367,7 @@ INTERVAL *intersectTo(INTERVAL *i1, double P)
   INTERVALLIST *i,*l;
   int j;
 
-  result = NEW(INTERVAL);
+  result = malloc(sizeof(INTERVAL));
   result->size = 0;
   i = NULL;
 
@@ -402,7 +401,7 @@ INTERVAL *intersectFrom(INTERVAL *i1, double P)
   INTERVALLIST *i,*l;
   int j;
   
-  result = NEW(INTERVAL);
+  result = malloc(sizeof(INTERVAL));
   result->size = 0;
   i = NULL;
 
@@ -468,7 +467,7 @@ INTERVAL *inverse(INTERVAL *i1)
     pos++;
   }
       
-  i = NEW(INTERVAL);
+  i = malloc(sizeof(INTERVAL));
   i->size = size;
   i->list = (size==0)?NULL:result->next;
   return i;
