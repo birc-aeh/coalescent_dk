@@ -255,7 +255,7 @@ static int extract_direct_ancestors_of_original_IDs(SEQUENCE *s)
   }
 }
 
-void dumpEdgesInTree(SEQUENCE *s)
+static void dumpEdgesInTree(SEQUENCE *s)
 {
   if (s->son == NULL)
     return;
@@ -264,7 +264,7 @@ void dumpEdgesInTree(SEQUENCE *s)
   dumpEdgesInTree(s->daughter);
 }
 
-void dumpType(SEQUENCE *s, int t)
+static void dumpType(SEQUENCE *s, int t)
 {
   while (s) {
     if (s->type == t) printf(" %d",s->ID);

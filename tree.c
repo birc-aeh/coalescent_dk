@@ -11,20 +11,20 @@ extern int seqs_len;      /* Number of sequences to choose from (k) */
 SEQUENCE *rootTime;       /* Base of timeline */
 static SEQUENCE *lastTime; /* Timeline */
 
-bool probCoalescens(double k)
+static bool probCoalescens(double k)
 {
   double sz = (k*(k-1.0))/(k*(k-1.0)+k*selection_rate);
   return (drand48()<sz);
 }
 
-double exponen(double f)
+static double exponen(double f)
 {
   return -log(drand48())/f;
 }
 
 static int edgeCounter = 0;
 
-void makeCoalescensNode(double newTime)
+static void makeCoalescensNode(double newTime)
 {
   SEQUENCE *s,*s1,*s2;
 
@@ -54,7 +54,7 @@ void makeCoalescensNode(double newTime)
   putSequence(s);
 }
 
-void makeSelectionNode(double newTime)
+static void makeSelectionNode(double newTime)
 {
   SEQUENCE *s,*r,*s1,*s2;
 
