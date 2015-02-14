@@ -244,7 +244,6 @@ void build(void)
   newTime = 0.0;
   initTerminator();
   initSequencePool();
-/*    initRootPoints(); */
 
   for (i=0; i<num_ini_seq; i++) {
     s = newSequence();
@@ -262,7 +261,6 @@ void build(void)
     printf("|\n");
   }
 
-  i = num_ini_seq;
   while (!theEnd()) {
     if (seqs_len == 1)
       printf("One size!!\n");
@@ -270,29 +268,19 @@ void build(void)
     double k = seqs_len;
     if (RZ) {
       if (exprate != 0.0) {
-	newTime = newTime + 
-	  log(1.0+exprate*exp(-newTime)*-2.0/(k*(k-1))*log(drand48()));
+        newTime = newTime + 
+          log(1.0+exprate*exp(-newTime)*-2.0/(k*(k-1))*log(drand48()));
       }
-	else
-	  newTime = newTime + exponen(k*(k-1.0)/2.0);
+      else
+        newTime = newTime + exponen(k*(k-1.0)/2.0);
     } else
       newTime = newTime + exponen(k*(k-1.0)/2.0+sumA());
 
-    //fprintf(stderr,"%f\n",newTime);
-
-
-    if (probCoalescens(k)) {
+    if (probCoalescens(k))
       makeCoalescensNode();
-      i++;
-    }
-    else {
+    else
       makeRecombinationNode();
-      i++;
-    }
   }
-
-/*    traverseTopSeqs(addTopPoints); */
-
 }
 
 
