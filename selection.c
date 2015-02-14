@@ -14,56 +14,36 @@ extern int num_ini_seq;
 
 //static void removeSingles(SEQUENCE *s
 
+static void compress_path(SEQUENCE *s, SEQUENCE *r, SEQUENCE **field)
+{
+  if (s->indegree == 0)
+    return;
+  SEQUENCE *old;
+  do {
+    old = r;
+    r = r->son;
+  } while (r->indegree==1 && r->outdegree==1);
+
+  if (old != s) {
+    *field = r;
+    if (r->father == old)
+      r->father = s;
+    else
+      r->mother = s;
+  }
+}
 
 static void pointThrough(SEQUENCE *s)
 {
-  SEQUENCE *r,*old;
-
-  //if (s == NULL) return;
-  //if (s->indegree == 0) return;
-
   while (s) {
-
-    if (s->indegree == 0) { s = s->revTime; continue; }
-
-    r = s;
-    do {
-      old = r;
-      r = r->son;
-    } while (r->indegree==1 && r->outdegree==1);
-  
-    if (old != s) {
-      s->son = r;
-      if (r->father == old)
-	r->father = s;
-      else
-	r->mother = s;
-    }
-
+    compress_path(s, s, &s->son);
     if (s->indegree==2 && 
 	s->daughter->indegree==1 && s->daughter->outdegree==1) {
-    
-      r = s->daughter;
-      do {
-	old = r;
-	r = r->son;
-      } while (r->indegree==1 && r->outdegree==1);
-    
-      if (old != s) {
-	s->daughter = r;
-	if (r->father == old)
-	  r->father = s;
-	else
-	  r->mother = s;
-      }
+      compress_path(s, s->daughter, &s->daughter);
     }
-    
     s = s->revTime;
   }
-
 }
-
-
 
 static void dumpStructure(void)
 {
