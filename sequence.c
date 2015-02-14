@@ -4,33 +4,26 @@
 #include "sequence.h"
 #include "sets.h"
 
-extern int alloc_size;
+int seqs_len = 0;                /* External - next free slot */
+static int seqs_alloc = 0;
+static SEQUENCE **seqs = NULL;
 
-typedef struct SeqArrayPointer {
-  SEQUENCE **array;
-  double thisA;
-  struct SeqArrayPointer *next,*prev;
-} SeqArrayPointer;
+static bool flipflop = false;    /* When traversing - the state of <visited> */
 
-double sumA;                           /* External                  */
-int size;                             /* External - next free slot */
-
-static bool flipflop;                 /* When traversing - the state of <visited> */
-static SeqArrayPointer *root,*last;   /* The root and active sequence array       */
-
-void recalculateThisA(SeqArrayPointer *sap);  /* prototype */
+double sumA(void)
+{
+  double res = 0.0;
+  int i = 0;
+  for (; i < seqs_len; i++)
+    res += seqs[i]->A;
+  return res;
+}
 
 void initSequencePool(void)
 {
-  sumA = 0.0;
-  size = 0;
   flipflop = false;
-  
-  root = last = malloc(sizeof(SeqArrayPointer));
-  root->array = malloc(alloc_size*sizeof(SEQUENCE *));
-  root->thisA = 0.0;
-  root->next = NULL;
-  root->prev = root;
+  seqs_alloc = 1000;
+  seqs = malloc(seqs_alloc * sizeof(SEQUENCE*));
 }
 
 /* Create a new sequence. */
@@ -56,71 +49,33 @@ SEQUENCE *newSequence(void)
 /* it if necessary.                             */
 void putSequence(SEQUENCE *s)
 {
-  int i;
-
-  sumA += s->A;
-
-  if (size%alloc_size==0 && size>0) {
-    if (last->next==NULL) {
-      last->next = malloc(sizeof(SeqArrayPointer));
-      last->next->array = malloc(alloc_size*sizeof(SEQUENCE *));
-      for (i=0; i<alloc_size; i++)
-	last->next->array[i] = NULL;
-      last->next->thisA = 0.0;
-      last->next->next = NULL;
-      last->next->prev = last;
-    }
-    last = last->next;
+  if (seqs_len == seqs_alloc) {
+    seqs_alloc *= 2;
+    seqs = realloc(seqs, seqs_alloc*sizeof(SEQUENCE*));
   }
-  
-  last->array[size%alloc_size] = s;
-  last->thisA += s->A;
-  size++;
+  seqs[seqs_len] = s;
+  seqs_len += 1;
 }
 
 /* Get sequence at index i - move the last sequence */ 
 /* in the structure to the freed slot.              */
 SEQUENCE *getSequence(int i)
 {
-  SEQUENCE *result;
-  SeqArrayPointer *table;
-  int j;
-
-  if (i>=size) {
+  if (i >= seqs_len) {
     fprintf(stderr,"Index out of range: getSequence(%i)\n",i);
     exit(1);
   }
-
-  table = root;
-  for(j=0; j<(i/alloc_size); j++)
-    table = table->next;
-
-  result = table->array[i%alloc_size];
-  size--;
-
-  table->array[i%alloc_size] = last->array[size%alloc_size];
-  table->thisA += last->array[size%alloc_size]->A;
-  last->array[size%alloc_size] = NULL;
-
-  if (size%alloc_size == 0) {
-    last->thisA = 0.0;
-    last = last->prev;
-  }
-  else {
-    if (last!=table)
-      recalculateThisA(last);
-  }
-
-  recalculateThisA(table);
-  recalculateA();
+  SEQUENCE *result = seqs[i];
+  seqs[i] = seqs[seqs_len-1];
+  seqs_len -= 1;
   return result;
 }  
 
 /* Get a totally random sequence. */
 SEQUENCE *getSomeSequence(void)
 {
-  if (size>0)
-    return getSequence(rand()%size);
+  if (seqs_len > 0)
+    return getSequence(rand() % seqs_len);
   else
     return NULL;
 }
@@ -128,102 +83,30 @@ SEQUENCE *getSomeSequence(void)
 /* Get a random sequence where each sequence has weight A/sumA */
 SEQUENCE *getWeightedSequence(void)
 {
-  SeqArrayPointer *sap;
-  double random,sum,old;
-  int i,j;
+  if (seqs_len == 0)
+    return NULL;
 
-  if (size==0) return NULL;
-
-  random = sumA*drand48();
-  sum = 0.0;
-  sap = root;
-  i=0;
+  double random = sumA()*drand48();
+  double sum = 0.0;
+  int i=0;
   
-  while (1) {
-    old = sum;
-    sum += sap->thisA;
-    if (random<=sum) {
-      sum = old;
-      for (j=0; j<alloc_size; j++) {
-	sum += sap->array[j]->A;
-	if (random<=sum) 
-	  return getSequence(i);
-	i++;
-      }
-    }
-    else
-      i += alloc_size;
-
-    sap = sap->next;
+  for (i = 0; i < seqs_len; i++)
+  {
+    SEQUENCE *s = seqs[i];
+    sum += s->A;
+    if (random <= sum)
+      return getSequence(i);
   }
-}
-
-/* Recalculate A for one block */
-void recalculateThisA(SeqArrayPointer *sap)
-{
-  int i;
-
-  sap->thisA = 0.0;
-  for(i=0;i<alloc_size;i++) {
-    if (sap->array[i]==NULL) return;
-    sap->thisA += sap->array[i]->A;
-  }
-}
-
-/* Recalculate sumA based on block values */
-void recalculateA(void)
-{
-  SeqArrayPointer *sap;
-
-  sumA = 0.0;
-  sap = root;
-  while(sap!=NULL) {
-    sumA += sap->thisA;
-    sap = sap->next;
-  }
-}
-
-/* Recalculate sumA and block values based on all sequences */
-void recalculateAllA(void)
-{
-  SeqArrayPointer *sap;
-  int j;
-  double thisA;
-
-  sumA = 0.0;
-  
-  sap = root;
-  while (sap!=NULL) {
-    thisA = 0.0;
-    for (j=0; j<alloc_size; j++) {
-      if (sap->array[j]==NULL) {
-	sap->thisA = thisA;
-	return;
-      }
-      sumA += sap->array[j]->A;
-      thisA += sap->array[j]->A;
-    }
-    sap->thisA = thisA;
-    sap = sap->next;
-  }
+  return NULL;
 }
 
 /* Iterate through the sequences in the structure, */
 /* calling function <opr> with each sequence.      */
 void traverseTopSeqs(void (*opr)(SEQUENCE *))
 {
-  SeqArrayPointer *sap;
-  int j;
-  
-  sap = root;
-  while (sap!=NULL) {
-    for (j=0; j<alloc_size; j++) {
-      if (sap->array[j]==NULL) 
-	return;
-      opr(sap->array[j]);
-    }
-    sap = sap->next;
-  }
+  int i;
+  for (i = 0; i < seqs_len; i++)
+    opr(seqs[i]);
 }
 
 /* Graph-traversal help function */

@@ -10,8 +10,8 @@ extern int num_ini_seq;   /* Number of initial sequences */
 extern int R;             /* Rekombination-rate */
 extern int RZ;
 
-extern double sumA;      /* The global A                           */
-extern int size;         /* Number of sequences to choose from (k) */
+extern double sumA(void);/* The global A                           */
+extern int seqs_len;     /* Number of sequences to choose from (k) */
 extern double newTime;   /* Elapsed time (backwards)               */
 extern double exprate;
 
@@ -20,14 +20,11 @@ static SEQUENCE *lastTime; /* Timeline */
 
 static int edgeCounter = 0;
 
-bool probCoalescens(void)
+static bool probCoalescens(double k)
 {
-  double sz;
-
-  if (RZ) return 1;
-  sz = (double)size;
-  sz = (sz*(sz-1.0))/(sz*(sz-1.0)+2.0*sumA);
-  return (drand48()<sz);
+  if (RZ)
+    return 1;
+  return (drand48() < (k*(k-1.0))/(k*(k-1.0)+2.0*sumA()));
 }
 
 double computeA(INTERVAL *i)
@@ -55,7 +52,7 @@ extern INTERVAL *last_make;
 void makeCoalescensNode(void)
 {
   SEQUENCE *s,*s1,*s2;
-  INTERVAL *i;
+  INTERVAL *i = NULL;
 
   s1 = getSomeSequence();
   s1->outdegree = 1;
@@ -157,6 +154,7 @@ void makeRecombinationNode(void)
   r->indegree = 1;
   r->outdegree = 2;
   r->son = s;
+  r->A = s->A;
   r->intervals = copyIntervals(s->intervals);
   r->gray = copyIntervals(s->gray);
   s->father = r;
@@ -266,24 +264,24 @@ void build(void)
 
   i = num_ini_seq;
   while (!theEnd()) {
-    if (size==1)
+    if (seqs_len == 1)
       printf("One size!!\n");
 
+    double k = seqs_len;
     if (RZ) {
       if (exprate != 0.0) {
 	newTime = newTime + 
-	  //log(1.0 + exponen((exp(newTime)*(size*(size-1)))/(2.0*exprate)));
-	  log(1.0+exprate*exp(-newTime)*-2.0/(size*(size-1))*log(drand48()));
+	  log(1.0+exprate*exp(-newTime)*-2.0/(k*(k-1))*log(drand48()));
       }
 	else
-	  newTime = newTime + exponen((double)size*((double)size-1.0)/2.0);
+	  newTime = newTime + exponen(k*(k-1.0)/2.0);
     } else
-      newTime = newTime + exponen((double)size*((double)size-1.0)/2.0+sumA);
+      newTime = newTime + exponen(k*(k-1.0)/2.0+sumA());
 
     //fprintf(stderr,"%f\n",newTime);
 
 
-    if (probCoalescens()) {
+    if (probCoalescens(k)) {
       makeCoalescensNode();
       i++;
     }
@@ -311,7 +309,6 @@ void intersectAll(INTERVAL *i)
   if (i==NULL) return;
   the_intervals = i;
   traverseTopSeqs(intersectOne);
-  recalculateAllA();
 }
 
 
