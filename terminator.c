@@ -370,19 +370,6 @@ bool theEnd(void)
   return (number_with_size[1]==roof);
 }
 
-
-void prettyTerm(void)
-{
-  
-  termList *t;
-  t = root;
-  while (t!=NULL) {
-    printf("%f:%i\n",t->z,t->k);
-    t = t->next;
-  }
-}
-
-
 extern SEQUENCE *rootTime;
 
 
@@ -580,25 +567,6 @@ int depthtree(REALTREE *t) {
       return rd+1;
   }
 }
-
-void printtree(REALTREE *t, FILE *treeFILE) {
-  int mdepth = depthtree(t)-1;
-  int n = num_ini_seq;
-  int curline = 0,j;
-  char **display = (char **) allocate((n*2-1) * sizeof(char *));
-  for(j=0; j<2*n-1; j++) {
-    display[j] = (char *) allocate((bl*(mdepth+1) + 7) * sizeof(char));
-    memset(display[j], ' ', bl*(1+mdepth) + 6);
-    display[j][bl*(1+mdepth)] = '\0';
-  }
-  printtree_r(display, mdepth,t, 0, &curline);
-  for(j=0; j<2*n-1; j++)
-    fprintf(treeFILE, "%s\n", display[j]);
-  for(j=0; j<2*n-1; j++)
-    free(display[j]);
-  free(display);
-}
-
 
 void printAlltree(REALTREE *t) {
   if (t!=NULL) {

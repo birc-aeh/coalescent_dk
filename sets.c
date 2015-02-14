@@ -110,19 +110,6 @@ INTERVALLIST *prependInterval(INTERVALLIST *i)
   return i;
 }
 
-/* Remove element i, returning a reference */
-/* to the element before <i>.              */
-INTERVALLIST *removeInterval(INTERVALLIST *i)
-{
-  INTERVALLIST *dead;
-  if (i==NULL) return NULL;
-  dead = i;
-  i = i->prev;
-  i->next = dead->next;
-  dead->next->prev = i;
-  return i;
-}
-
 /* Copy values in <source> interval to <dest> interval */
 void cloneInterval(INTERVALLIST *dest, INTERVALLIST *source)
 {

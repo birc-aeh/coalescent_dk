@@ -227,26 +227,6 @@ void traverseTopSeqs(void (*opr)(SEQUENCE *))
   }
 }
 
-/* Iterate through all sequences in the graph, */
-/* calling function <opr> with each sequence.  */
-void traverseSeqs(void (*opr)(SEQUENCE *))
-{
-  SeqArrayPointer *sap;
-  int j;
-  sap = root;
-
-  flipflop = !flipflop;
-
-  while (sap!=NULL) {
-    for (j=0; j<alloc_size; j++) {
-      if (sap->array[j]==NULL)
-	return;
-      handleSeq(sap->array[j],opr);
-    }
-    sap = sap->next;
-  }
-}
-
 /* Graph-traversal help function */
 void handleSeq(SEQUENCE *s, void (*opr)(SEQUENCE *))
 {
