@@ -193,23 +193,14 @@ static void dumpTree(SEQUENCE *s)
 
 static double measureEdges(SEQUENCE *s)
 {
-  double res;
-
-  res = 0.0;
+  double res = 0.0;
   while (s) {
-    switch (s->indegree) {
-    case 0:
-      break;
-    case 1:
+    if (s->indegree > 0)
       res += s->Time - s->son->Time;
-      break;
-    case 2:
-      res += (s->Time - s->son->Time)+(s->Time - s->daughter->Time);
-      break;    
-    }
+    if (s->indegree > 1)
+      res += s->Time - s->daughter->Time;
     s = s->revTime;
   }
-
   return res;
 }
 
