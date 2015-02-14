@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "structures.h"
 #include "sequence.h"
@@ -295,41 +296,26 @@ static void removeDummies(SEQUENCE **r)
 }
 
 
-static int extractTree(SEQUENCE *s)
+static int extract_direct_ancestors_of_original_IDs(SEQUENCE *s)
 {
-  int good;
-
-  if (s==NULL) return 1;
-
-  switch (s->indegree) {
-  case 0:
-    good = s->ID<num_ini_seq;
-    if (!good) s->outdegree=0;
-    return good;
-  case 1:
-    fprintf(stderr,"Bad trim\n");
-    exit(1);
-  case 2:
-    if (!extractTree(s->son)) {
+  if (s->indegree == 0)
+    return s->ID < num_ini_seq;
+  else {
+    assert(s->indegree == 2);
+    if (!extract_direct_ancestors_of_original_IDs(s->son)) {
       s->indegree--;
       s->son = NULL;
     }
-    if (!extractTree(s->daughter)) {
+    if (!extract_direct_ancestors_of_original_IDs(s->daughter)) {
       s->indegree--;
       s->daughter = NULL;
     }
-    if (s->indegree==1 && s->son==NULL) {
+    if (s->indegree == 1 && s->son == NULL) {
       s->son = s->daughter;
       s->daughter = NULL;
     }
-    good = s->indegree>0;
-    if (!good) s->outdegree=0;
-    return good;
+    return s->indegree > 0;
   }
-    
-  fprintf(stderr,"Bad extract\n");
-  exit(1);
-  return -1;
 }
 
 
@@ -380,7 +366,7 @@ void makeSelection(void)
   removeDummies(&s);
 
 
-  extractTree(s);
+  extract_direct_ancestors_of_original_IDs(s);
   removeDummies(&s);
 
   printf("ME");
