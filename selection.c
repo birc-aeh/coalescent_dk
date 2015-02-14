@@ -93,7 +93,7 @@ static void dumpStructure(void)
 
 }
 
-static void eraseIncoming(SEQUENCE *s)
+static void erase_from_mother(SEQUENCE *s)
 {
   s->mother->indegree--;
   if (s->mother->son == s) {
@@ -108,7 +108,7 @@ static void eraseIncoming(SEQUENCE *s)
   s->mother = NULL;
 }
 
-static void eraseContinuing(SEQUENCE *s)
+static void erase_from_father(SEQUENCE *s)
 {
   s->father->indegree--;
   if (s->father->son == s) {
@@ -156,9 +156,9 @@ static void trimSelection(SEQUENCE *r)
 
       r->type = kind_m | kind_f;
       if (kind_m)
-        eraseContinuing(r);
+        erase_from_father(r);
       else
-        eraseIncoming(r);
+        erase_from_mother(r);
     }
     else if (r->father == NULL) {
       r->type = 1;
