@@ -1,6 +1,6 @@
 
 CC = gcc
-CFLAGS = -O3 -Wall
+CFLAGS = -O3 -Wall -m32
 #CFLAGS = -g -Wall
 
 HEADERS = structures.h sets.h memory.h sequence.h tree.h terminator.h arguments.h 
