@@ -40,7 +40,6 @@ SEQUENCE *newSequence(void)
   result->reversed = false;
   result->x = -1;
   result->y = -1;
-  result->matleft = -1.0;
   result->gray = emptyInterval();
   return result;
 }

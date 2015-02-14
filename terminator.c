@@ -29,8 +29,6 @@ static bool some_k_became_one;
 
 static jumpList *jlist;
 
-static double matleft;
-
 int max(int a, int b)
 {
   return a>b ? a:b;
@@ -73,7 +71,8 @@ void initTerminator(void)
   root->prev = NULL;
 
   number_with_size = malloc(sizeof(int)*(num_ini_seq+1));
-  for (i=0; i<num_ini_seq; number_with_size[i++]=0);
+  for (i=0; i<num_ini_seq; i++)
+      number_with_size[i]=0;
   number_with_size[num_ini_seq] = 1;
   roof = 1;
   some_k_became_one = false;
@@ -259,9 +258,6 @@ INTERVAL *makeIntervals(void)
     sum += il->end-il->start;
     il = il->next;
   }
-
-  matleft = 200.0*sum/(float)R;
-
   return i;
 }
 
@@ -358,9 +354,8 @@ double updateOneK(void)
     last_make = makeIntervals();
     intersectAll(last_make);
     some_k_became_one = false;
-    return matleft;
+    return 1.0;
   }
-  some_k_became_one = false;
   return -1.0;
 }
 

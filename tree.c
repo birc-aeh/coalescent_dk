@@ -85,7 +85,7 @@ void makeCoalescensNode(void)
 
   putSequence(s);
 
-  s->matleft = updateOneK();  
+  double update = updateOneK();  
 
   printf("N %i|1|%f|",s->ID,s->Time);
   printf("Time:%f",s->Time);
@@ -95,7 +95,7 @@ void makeCoalescensNode(void)
   prettyInterval(s->intervals);
   printf(" |");
 
-  if (s->matleft>=0.0) {
+  if (update >= 0.0) {
 
     if (last_make!=NULL) {
       i = inverse(last_make);
@@ -110,7 +110,7 @@ void makeCoalescensNode(void)
 
   printf(" |");
   prettyInterval(s->gray);
-  if (s->matleft>=0.0)
+  if (update >= 0.0)
     s->gray = uniteNoTerm(i,s->gray);
 
   printf("\n");
