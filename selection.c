@@ -16,13 +16,13 @@ extern int num_ini_seq;
 
 static void compress_path(SEQUENCE *s, SEQUENCE *r, SEQUENCE **field)
 {
-  if (s->indegree == 0)
+  if (s->children == 0)
     return;
   SEQUENCE *old;
   do {
     old = r;
     r = r->son;
-  } while (r->indegree==1 && r->outdegree==1);
+  } while (r->children==1 && r->parents==1);
 
   if (old != s) {
     *field = r;
@@ -37,8 +37,8 @@ static void pointThrough(SEQUENCE *s)
 {
   while (s) {
     compress_path(s, s, &s->son);
-    if (s->indegree==2 && 
-	s->daughter->indegree==1 && s->daughter->outdegree==1) {
+    if (s->children==2 && 
+	s->daughter->children==1 && s->daughter->parents==1) {
       compress_path(s, s->daughter, &s->daughter);
     }
     s = s->revTime;
@@ -47,16 +47,16 @@ static void pointThrough(SEQUENCE *s)
 
 static void dumpStructure(void)
 {
-  /* The original probably has a bug here. indegree 1 outputs 2 and indegree 2
+  /* The original probably has a bug here. children 1 outputs 2 and children 2
    * outputs 1 - I'm trying to keep identical output though */
   int extra_field[] = {0,2,1};
   SEQUENCE *s = rootTime;
   while (s) {
-    printf("N %i|%i|%f|", s->ID, extra_field[s->indegree], s->Time);
+    printf("N %i|%i|%f|", s->ID, extra_field[s->children], s->Time);
     printf("Time:%f\n",s->Time);
-    if (s->indegree > 0)
+    if (s->children > 0)
       printf("E %d|%d|%d\n",s->sonID,s->son->ID,s->ID);
-    if (s->indegree > 1)
+    if (s->children > 1)
       printf("E %d|%d|%d\n",s->daughterID,s->daughter->ID,s->ID);
     s = s->nextTime;
   }
@@ -64,7 +64,7 @@ static void dumpStructure(void)
 
 static void erase_from_mother(SEQUENCE *s)
 {
-  s->mother->indegree--;
+  s->mother->children--;
   if (s->mother->son == s) {
     s->mother->son = s->mother->daughter;
     s->mother->sonID = s->mother->daughterID;
@@ -73,13 +73,13 @@ static void erase_from_mother(SEQUENCE *s)
 
   s->mother->daughter = NULL;
 
-  s->outdegree--;
+  s->parents--;
   s->mother = NULL;
 }
 
 static void erase_from_father(SEQUENCE *s)
 {
-  s->father->indegree--;
+  s->father->children--;
   if (s->father->son == s) {
     s->father->son = s->father->daughter;
     s->father->sonID = s->father->daughterID;
@@ -87,7 +87,7 @@ static void erase_from_father(SEQUENCE *s)
   }
   s->father->daughter = NULL;
 
-  s->outdegree--;
+  s->parents--;
   s->father = s->mother;
   s->mother = NULL;
 }
@@ -116,10 +116,10 @@ static void trimSelection(SEQUENCE *r)
 {
   while (r) {
 
-    if (r->outdegree == 1) {
+    if (r->parents == 1) {
       r->type = getType(r, r->father);
     }
-    else if (r->indegree == 1 && r->outdegree == 2) {
+    else if (r->children == 1 && r->parents == 2) {
       int kind_m = getType(r, r->mother);
       int kind_f = getType(r, r->father);
 
@@ -143,19 +143,19 @@ static void dumpTree(SEQUENCE *s)
 {
   if (s == NULL) return;
 
-  if (s->indegree == 0 && s->outdegree == 1) {
+  if (s->children == 0 && s->parents == 1) {
     printf("%d ",s->ID);
     return;
   }
 
-  if (s->indegree == 2 && s->outdegree < 2) {
+  if (s->children == 2 && s->parents < 2) {
     printf("%f ",s->Time);
     dumpTree(s->son);
     dumpTree(s->daughter);
     return;
   }
 
-  fprintf(stderr,"Bad tree (i:%d o:%d)\n",s->indegree,s->outdegree);
+  fprintf(stderr,"Bad tree (i:%d o:%d)\n",s->children,s->parents);
   exit(1);
 }
 
@@ -164,9 +164,9 @@ static double measureEdges(SEQUENCE *s)
 {
   double res = 0.0;
   while (s) {
-    if (s->indegree > 0)
+    if (s->children > 0)
       res += s->Time - s->son->Time;
-    if (s->indegree > 1)
+    if (s->children > 1)
       res += s->Time - s->daughter->Time;
     s = s->revTime;
   }
@@ -177,11 +177,11 @@ static double measureEdges(SEQUENCE *s)
 static void placeMutation(SEQUENCE *s, double place)
 {
   while (s) {
-    if (s->indegree > 0) {
+    if (s->children > 0) {
       place = place - (s->Time - s->son->Time);
       if (place < 0.0) s->son_is_mutated = !s->son_is_mutated;
     }
-    if (s->indegree > 1) {
+    if (s->children > 1) {
       place = place - (s->Time - s->daughter->Time);
       if (place < 0.0) s->daughter_is_mutated = !s->daughter_is_mutated;
     }
@@ -193,9 +193,9 @@ static void placeMutation(SEQUENCE *s, double place)
 static void dumpMutations(SEQUENCE *s)
 {
   while (s) {
-    if (s->indegree > 0 && s->son_is_mutated)
+    if (s->children > 0 && s->son_is_mutated)
       printf(" %d",s->sonID);
-    if (s->indegree > 1 && s->daughter_is_mutated)
+    if (s->children > 1 && s->daughter_is_mutated)
       printf(" %d",s->daughterID);
     s = s->revTime;
   }
@@ -256,17 +256,17 @@ static void removeDummies(SEQUENCE **r)
   SEQUENCE *s;
 
   s = *r;
-  while (s->indegree == 1)
+  while (s->children == 1)
     s=s->son;
-  s->outdegree = 0;
+  s->parents = 0;
   *r = s;
 
   pointThrough(s);
 
   s = rootTime;
   while (s->nextTime) {
-    if ((s->nextTime->indegree==1 && s->nextTime->outdegree<2) ||
-	(s->nextTime->indegree==0 && s->nextTime->outdegree==0))
+    if ((s->nextTime->children==1 && s->nextTime->parents<2) ||
+	(s->nextTime->children==0 && s->nextTime->parents==0))
       s->nextTime = s->nextTime->nextTime;
     else
       s = s->nextTime;
@@ -278,23 +278,23 @@ static void removeDummies(SEQUENCE **r)
 
 static int extract_direct_ancestors_of_original_IDs(SEQUENCE *s)
 {
-  if (s->indegree == 0)
+  if (s->children == 0)
     return s->ID < num_ini_seq;
   else {
-    assert(s->indegree == 2);
+    assert(s->children == 2);
     if (!extract_direct_ancestors_of_original_IDs(s->son)) {
-      s->indegree--;
+      s->children--;
       s->son = NULL;
     }
     if (!extract_direct_ancestors_of_original_IDs(s->daughter)) {
-      s->indegree--;
+      s->children--;
       s->daughter = NULL;
     }
-    if (s->indegree == 1 && s->son == NULL) {
+    if (s->children == 1 && s->son == NULL) {
       s->son = s->daughter;
       s->daughter = NULL;
     }
-    return s->indegree > 0;
+    return s->children > 0;
   }
 }
 

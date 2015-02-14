@@ -14,8 +14,8 @@ typedef struct SEQUENCE {
 
   double Time;
 
-  int indegree;
-  int outdegree;
+  int children;
+  int parents;
 
   struct SEQUENCE *father;
   struct SEQUENCE *mother;
