@@ -66,31 +66,19 @@ static void pointThrough(SEQUENCE *s)
 
 static void dumpStructure(void)
 {
-  SEQUENCE *s;
-
-  s = rootTime;
-
+  /* The original probably has a bug here. indegree 1 outputs 2 and indegree 2
+   * outputs 1 - I'm trying to keep identical output though */
+  int extra_field[] = {0,2,1};
+  SEQUENCE *s = rootTime;
   while (s) {
-    switch (s->indegree) {      
-    case 0:
-      printf("N %i|0|%f|",s->ID,s->Time);
-      printf("Time:%f\n",s->Time);
-      break;
-    case 1:
-      printf("N %i|2|%f|",s->ID,s->Time);
-      printf("Time:%f\n",s->Time);
-      printf("E %i|%i|%i\n",s->sonID,s->son->ID,s->ID);
-      break;
-    case 2:      
-      printf("N %i|1|%f|",s->ID,s->Time);
-      printf("Time:%f\n",s->Time);
+    printf("N %i|%i|%f|", s->ID, extra_field[s->indegree], s->Time);
+    printf("Time:%f\n",s->Time);
+    if (s->indegree > 0)
       printf("E %d|%d|%d\n",s->sonID,s->son->ID,s->ID);
+    if (s->indegree > 1)
       printf("E %d|%d|%d\n",s->daughterID,s->daughter->ID,s->ID);
-      break;
-    }
     s = s->nextTime;
   }
-
 }
 
 static void erase_from_mother(SEQUENCE *s)
