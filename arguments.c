@@ -5,19 +5,14 @@
 
 #include "arguments.h"
 
-int num_ini_seq;      /* Number of initial sequences            */
-
-double selection_rate;
-double M;
+int num_ini_seq = 5;
+double selection_rate = 0.0;
+double M = 10.0;
 
 void parseArguments(int argc, char **argv)
 {
   char *c;
-  num_ini_seq = 5;
   int seed = time(NULL);
-
-  selection_rate = 0.0;
-  M = 10.0;
 
   for (argc--;argc>0;argc--) {
     c = argv[argc];

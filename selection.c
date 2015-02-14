@@ -11,14 +11,11 @@ extern SEQUENCE *rootTime;
 extern double M;
 extern int num_ini_seq;
 
-
-//static void removeSingles(SEQUENCE *s
-
 static void compress_path(SEQUENCE *s, SEQUENCE *r, SEQUENCE **field)
 {
+  SEQUENCE *old;
   if (s->children == 0)
     return;
-  SEQUENCE *old;
   do {
     old = r;
     r = r->son;
@@ -92,7 +89,6 @@ static void erase_from_father(SEQUENCE *s)
   s->mother = NULL;
 }
 
-
 static int isMutated(SEQUENCE *child, SEQUENCE *parent)
 {
   if (parent->son == child)
@@ -111,11 +107,9 @@ static int getType(SEQUENCE *child, SEQUENCE *parent)
   return isMutated(child,parent)? !parent->type : parent->type;
 }
 
-
 static void trimSelection(SEQUENCE *r)
 {
   while (r) {
-
     if (r->parents == 1) {
       r->type = getType(r, r->father);
     }
@@ -132,33 +126,27 @@ static void trimSelection(SEQUENCE *r)
     else if (r->father == NULL) {
       r->type = 1;
     }
-
     r = r->prevTime;
   }
-  
 }
-
 
 static void dumpTree(SEQUENCE *s)
 {
-  if (s == NULL) return;
-
+  if (s == NULL)
+    return;
   if (s->children == 0 && s->parents == 1) {
     printf("%d ",s->ID);
     return;
   }
-
   if (s->children == 2 && s->parents < 2) {
     printf("%f ",s->Time);
     dumpTree(s->son);
     dumpTree(s->daughter);
     return;
   }
-
   fprintf(stderr,"Bad tree (i:%d o:%d)\n",s->children,s->parents);
   exit(1);
 }
-
 
 static double measureEdges(SEQUENCE *s)
 {
@@ -172,7 +160,6 @@ static double measureEdges(SEQUENCE *s)
   }
   return res;
 }
-
 
 static void placeMutation(SEQUENCE *s, double place)
 {
@@ -189,7 +176,6 @@ static void placeMutation(SEQUENCE *s, double place)
   }
 }
 
-
 static void dumpMutations(SEQUENCE *s)
 {
   while (s) {
@@ -201,39 +187,27 @@ static void dumpMutations(SEQUENCE *s)
   }
 }
 
-
-
-
-
 static int poissonDist(double mean)
 {
-  double U,Nom,Den;
   int i;
-
-  U = drand48()/exp(-mean);
-  Nom = 1.0;
-  Den = 1.0;
-
+  double U = drand48()/exp(-mean);
+  double Nom = 1.0;
+  double Den = 1.0;
   for (i=0; U>0.0; i++) {
     U -= Nom/Den;
     Nom *= mean;
     Den *= (double)(i+1);
   }
-  
   return i;
 }
 
-
 static void selectionMutation(SEQUENCE *s)
 {
-  double length,place;
-  int i,muts;
-
-  length = measureEdges(s);
-  muts = poissonDist(M);
-
+  double length = measureEdges(s);
+  int muts = poissonDist(M);
+  int i;
   for (i=0; i<muts; i++) {
-    place = drand48()*length;
+    double place = drand48()*length;
     placeMutation(s,place);
   }
 }
@@ -261,7 +235,6 @@ static void removeDummies(SEQUENCE **r)
   }
 }
 
-
 static int extract_direct_ancestors_of_original_IDs(SEQUENCE *s)
 {
   if (s->children == 0)
@@ -284,11 +257,10 @@ static int extract_direct_ancestors_of_original_IDs(SEQUENCE *s)
   }
 }
 
-
 void dumpEdgesInTree(SEQUENCE *s)
 {
-  if (s->son == NULL) return;
-  
+  if (s->son == NULL)
+    return;
   printf(" %d %d",s->sonID,s->daughterID);
   dumpEdgesInTree(s->son);
   dumpEdgesInTree(s->daughter);
@@ -301,7 +273,6 @@ void dumpType(SEQUENCE *s, int t)
     s = s->prevTime;
   }
 }
-
 
 void makeSelection(void)
 {
@@ -328,7 +299,6 @@ void makeSelection(void)
   dumpType(s,0);
   printf("\n");  
   removeDummies(&s);
-
 
   extract_direct_ancestors_of_original_IDs(s);
   removeDummies(&s);

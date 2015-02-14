@@ -5,14 +5,11 @@
 #include "structures.h"
 #include "sequence.h"
 
+extern double selection_rate;
 extern int num_ini_seq;   /* Number of initial sequences */
-
 extern int seqs_len;      /* Number of sequences to choose from (k) */
-
 SEQUENCE *rootTime;       /* Base of timeline */
 static SEQUENCE *lastTime; /* Timeline */
-
-extern double selection_rate;
 
 bool probCoalescens(double k)
 {
@@ -97,14 +94,11 @@ void makeSelectionNode(double newTime)
 
 void build(void)
 {
-  SEQUENCE *s;
   int i;
-  
-  rootTime = lastTime = NULL;
   double newTime = 0.0;
-
+  rootTime = lastTime = NULL;
   for (i=0; i<num_ini_seq; i++) {
-    s = newSequence();
+    SEQUENCE *s = newSequence();
     s->children = 0;
     s->parents = 0;
     s->Time = 0.0;
@@ -122,20 +116,13 @@ void build(void)
     }
   }
 
-  i = num_ini_seq;
   while (seqs_len>1) {
     double k = (double)seqs_len;
-
     newTime = newTime + exponen(k*(k-1.0)/2.0+k*selection_rate);
-
-    if (probCoalescens(k)) {
+    if (probCoalescens(k))
       makeCoalescensNode(newTime);
-      i++;
-    }
-    else {
+    else
       makeSelectionNode(newTime);
-      i++;
-    }
   }
 }
 

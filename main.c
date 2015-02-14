@@ -7,14 +7,8 @@
 #include "arguments.h"
 #include "selection.h"
 
-extern int num_ini_seq;
-
 int main(int argc, char **argv) 
 {
-/*    int i,max,index; */
-/*    FILE *f; */
-
-
   parseArguments(argc,argv);
 
   printf("Selection\n");
@@ -27,9 +21,5 @@ int main(int argc, char **argv)
   build();
 
   makeSelection();
-
-/*    printf("\n"); */
-/*    makeRealTree(); */
-
   return 0;
 }
