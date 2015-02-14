@@ -41,14 +41,9 @@ void makeCoalescensNode(double newTime)
   s->children = 2;
   s->parents = 0;
 
-  if (lastTime==NULL) {
-    lastTime = s;
-    rootTime = s;
-  }
-  else {
-    lastTime->nextTime = s;
-    lastTime = s;
-  }
+  lastTime->nextTime = s;
+  s->prevTime = lastTime;
+  lastTime = s;
 
   s->son = s1;
   s->sonID = edgeCounter++;
@@ -75,14 +70,9 @@ void makeSelectionNode(double newTime)
   r->son = s;
   s->father = r;
 
-  if (lastTime==NULL) {
-    lastTime = r;
-    rootTime = r;
-  }
-  else {
-    lastTime->nextTime = r;
-    lastTime = r;
-  }
+  lastTime->nextTime = r;
+  r->prevTime = lastTime;
+  lastTime = r;
 
   r->Time = newTime;
 
@@ -127,6 +117,7 @@ void build(void)
     }
     else {
       lastTime->nextTime = s;
+      s->prevTime = lastTime;
       lastTime = s;
     }
   }

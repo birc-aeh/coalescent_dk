@@ -238,19 +238,6 @@ static void selectionMutation(SEQUENCE *s)
   }
 }
 
-
-void reverseTime(void)
-{
-  SEQUENCE *s = rootTime;
-
-  s->prevTime = NULL;
-
-  while (s->nextTime != NULL) {
-    s->nextTime->prevTime = s;
-    s = s->nextTime;   
-  }
-}
-
 static void removeDummies(SEQUENCE **r)
 {
   SEQUENCE *s = *r;
@@ -264,8 +251,11 @@ static void removeDummies(SEQUENCE **r)
   s = rootTime;
   while (s->nextTime) {
     if ((s->nextTime->children==1 && s->nextTime->parents<2) ||
-	(s->nextTime->children==0 && s->nextTime->parents==0))
+	(s->nextTime->children==0 && s->nextTime->parents==0)) {
       s->nextTime = s->nextTime->nextTime;
+      if (s->nextTime != NULL)
+        s->nextTime->prevTime = s;
+    }
     else
       s = s->nextTime;
   }
@@ -322,9 +312,7 @@ void makeSelection(void)
     exit(1);
   }
 
-  reverseTime();
   removeDummies(&s);
-  reverseTime();
 
   selectionMutation(s);
   dumpStructure();
@@ -333,7 +321,6 @@ void makeSelection(void)
   dumpMutations(s);
   printf("\n");
 
-  reverseTime();
   trimSelection(s);
   printf("T0");
   dumpType(s,1);
@@ -341,12 +328,10 @@ void makeSelection(void)
   dumpType(s,0);
   printf("\n");  
   removeDummies(&s);
-  reverseTime();
 
 
   extract_direct_ancestors_of_original_IDs(s);
   removeDummies(&s);
-  reverseTime();
 
   printf("ME");
   dumpEdgesInTree(s);
