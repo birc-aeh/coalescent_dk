@@ -207,29 +207,16 @@ static double measureEdges(SEQUENCE *s)
 
 static void placeMutation(SEQUENCE *s, double place)
 {
-
   while (s) {
-    switch (s->indegree) {
-    case 0:
-      break;
-    case 1:
+    if (s->indegree > 0) {
       place = place - (s->Time - s->son->Time);
       if (place < 0.0) s->son_is_mutated = !s->son_is_mutated;
-      break;
-    case 2:
-      place = place - (s->Time - s->son->Time);
-      if (place < 0.0) s->son_is_mutated = !s->son_is_mutated;
-
+    }
+    if (s->indegree > 1) {
       place = place - (s->Time - s->daughter->Time);
       if (place < 0.0) s->daughter_is_mutated = !s->daughter_is_mutated;
-      break;
     }
     s = s->revTime;
-  }
-
-  if (place >= 0.0) {
-    printf("Bad place mutation %f\n",place);
-    exit(1);
   }
 }
 
