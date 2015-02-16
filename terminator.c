@@ -16,8 +16,8 @@ typedef struct termList {
 } termList;
 
 static termList *root;
-static int *number_with_size;
-static int roof;
+static int *terms_with_size;
+static int nterms;
 static bool some_k_became_one;
 
 int max(int a, int b)
@@ -27,29 +27,27 @@ int max(int a, int b)
 
 void prependElement(termList *t,double z)
 {
-  termList *n;
-  n = malloc(sizeof(termList));
+  termList *n = malloc(sizeof(termList));
   n->prev = t->prev;
   n->prev->next = n;
   n->next = t;
-  n->next->prev = n;
+  t->prev = n;
   n->z = z;
   n->k = n->prev->k;
-  number_with_size[t->prev->k]++;
-  roof++;
+  terms_with_size[n->k]++;
+  nterms++;
 }
 
 void appendElement(termList *t,double z)
 {
-  termList *n;
-  n = malloc(sizeof(termList));
+  termList *n = malloc(sizeof(termList));
   n->next = NULL;
   n->prev = t;
-  n->prev->next = n;
+  t->next = n;
   n->z = z;
-  n->k = n->prev->k;
-  number_with_size[t->k]++;
-  roof++;
+  n->k = t->k;
+  terms_with_size[n->k]++;
+  nterms++;
 }
 
 void initTerminator(void)
@@ -61,11 +59,11 @@ void initTerminator(void)
   root->next = NULL;
   root->prev = NULL;
 
-  number_with_size = malloc(sizeof(int)*(num_ini_seq+1));
+  terms_with_size = malloc(sizeof(int)*(num_ini_seq+1));
   for (i=0; i<num_ini_seq; i++)
-      number_with_size[i]=0;
-  number_with_size[num_ini_seq] = 1;
-  roof = 1;
+      terms_with_size[i]=0;
+  terms_with_size[num_ini_seq] = 1;
+  nterms = 1;
   some_k_became_one = false;
 }
 
@@ -178,9 +176,9 @@ void updateCoalescens(double from, double to)
   termList *t = root;
   while (t != NULL) {
     if ((t->z >= from) && (t->z < to)) {
-      number_with_size[t->k]--;
+      terms_with_size[t->k]--;
       t->k--;
-      number_with_size[t->k]++;
+      terms_with_size[t->k]++;
       if (t->k == 1) {
 	some_k_became_one = true;
       }
@@ -207,7 +205,8 @@ double updateOneK(INTERVAL **last_make)
 
 bool theEnd(void)
 {
-  return (number_with_size[1]==roof);
+  /* Stop when all terms have size 1 */
+  return (terms_with_size[1]==nterms);
 }
 
 extern SEQUENCE *rootTime;
