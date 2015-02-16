@@ -118,7 +118,7 @@ void cloneInterval(INTERVALLIST *dest, INTERVALLIST *source)
 
 
 /* Unite intervals <i1> with <i2> */
-INTERVAL *unite(INTERVAL *i1, INTERVAL *i2)
+INTERVAL *unite(INTERVAL *i1, INTERVAL *i2, coal_callback cb)
 {
   INTERVAL *i;
   INTERVALLIST *result,*il1,*il2;
@@ -133,12 +133,12 @@ INTERVAL *unite(INTERVAL *i1, INTERVAL *i2)
   
   while ((pos1<i1->size) && (pos2<i2->size)) {
     if ((il1->end > il2->start) && (il1->end <= il2->end)) {
-      updateCoalescens(fmax(il1->start,il2->start),il1->end);
+      cb(fmax(il1->start,il2->start),il1->end);
       il1 = il1->next;
       pos1++;
     }
     else if ((il2->end > il1->start) && (il2->end <= il1->end)) {
-      updateCoalescens(fmax(il1->start,il2->start),il2->end);
+      cb(fmax(il1->start,il2->start),il2->end);
       il2 = il2->next;
       pos2++;
     }
@@ -222,84 +222,13 @@ INTERVAL *unite(INTERVAL *i1, INTERVAL *i2)
   return i;
 }
 
-
+void dummy_coal_update(double a, double b)
+{
+}
 /* Unite without updating terminator */
 INTERVAL *uniteNoTerm(INTERVAL *i1, INTERVAL *i2)
 {
-  INTERVAL *i;
-  INTERVALLIST *result,*il1,*il2;
-  int size,pos1,pos2;
-  double seen;
-  bool success;
-  
-  /* Build united interval list */
-  il1 = i1->list;
-  il2 = i2->list;
-  result = NULL;
-  pos1=0; pos2=0; size=0; seen=0.0;
-
-  while ((pos1<i1->size) && (pos2<i2->size)) {
-    result = appendInterval(result);
-    size++;
-    if (il1->start < il2->start) {
-      result->start = il1->start;
-      seen = il1->end;
-    }
-    else {
-      result->start = il2->start;
-      seen = il2->end;
-    }
-
-    success = true;
-    while (success) {
-      if ((seen >= il1->start) && (seen <= il1->end) && (pos1<i1->size)) {	
-	seen = il1->end;
-	il1 = il1->next;
-	pos1++;
-      }
-      else if ((seen >= il2->start) && (seen <= il2->end) && (pos2<i2->size)) {
-	seen = il2->end;
-	il2 = il2->next;
-	pos2++;
-      }
-      else 
-	success = false;
-      
-      while ((il1->end < seen) && (pos1 < i1->size)) {
-	il1 = il1->next;
-	pos1++;
-      }
-      while ((il2->end < seen) && (pos2 < i2->size)) {
-	il2 = il2->next;
-	pos2++;
-      }
-
-      if (!success) 
-	result->end = seen;
-    }
-  }
-
-  while (pos1<i1->size) {
-    result = appendInterval(result);
-    size++;
-    cloneInterval(result,il1);
-    il1 = il1->next;
-    pos1++;
-  }
-
-  while (pos2<i2->size) {
-    result = appendInterval(result);
-    size++;
-    cloneInterval(result,il2);
-    il2 = il2->next;
-    pos2++;
-  }
-
-  i = malloc(sizeof(INTERVAL));
-  i->size = size;
-  i->list = (result==NULL ? NULL:result->next);
-
-  return i;
+    return unite(i1, i2, dummy_coal_update);
 }
 
 

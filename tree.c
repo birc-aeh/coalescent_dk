@@ -72,7 +72,7 @@ void makeCoalescensNode(double time)
 
   s->son = s1;
   s->daughter = s2;
-  s->intervals = unite(s1->intervals,s2->intervals);
+  s->intervals = unite(s1->intervals,s2->intervals, updateCoalescens);
   s->A = computeA(s->intervals);
   s->Time = time;
   s->gray = uniteNoTerm(s1->gray,s2->gray);

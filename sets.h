@@ -7,7 +7,8 @@ INTERVAL *emptyInterval(void);
 INTERVAL *initInterval(double x1, double y1);
 INTERVAL *copyIntervals(INTERVAL *i);
 
-INTERVAL *unite(INTERVAL *i1, INTERVAL *i2);
+typedef void coal_callback(double, double);
+INTERVAL *unite(INTERVAL *i1, INTERVAL *i2, coal_callback);
 INTERVAL *uniteNoTerm(INTERVAL *i1, INTERVAL *i2);
 
 void intersect(INTERVAL *dest, INTERVAL *i);
