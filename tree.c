@@ -12,7 +12,6 @@ extern int RZ;
 
 extern double sumA(void);/* The global A                           */
 extern int seqs_len;     /* Number of sequences to choose from (k) */
-extern double newTime;   /* Elapsed time (backwards)               */
 extern double exprate;
 
 SEQUENCE *rootTime;       /* Base of timeline */
@@ -49,7 +48,7 @@ double getLegalPoint(INTERVAL *i)
 
 extern INTERVAL *last_make;
 
-void makeCoalescensNode(void)
+void makeCoalescensNode(double time)
 {
   SEQUENCE *s,*s1,*s2;
   INTERVAL *i = NULL;
@@ -77,7 +76,7 @@ void makeCoalescensNode(void)
   s->daughter = s2;
   s->intervals = unite(s1->intervals,s2->intervals);
   s->A = computeA(s->intervals);
-  s->Time = newTime;
+  s->Time = time;
   s->gray = uniteNoTerm(s1->gray,s2->gray);
 
   s1->father = s;
@@ -141,7 +140,7 @@ void makeCoalescensNode(void)
 }
 
 
-void makeRecombinationNode(void)
+void makeRecombinationNode(double time)
 {
   SEQUENCE *s,*r,*s1,*s2;
   double P;
@@ -168,7 +167,7 @@ void makeRecombinationNode(void)
     lastTime = r;
   }
 
-  r->Time = newTime;
+  r->Time = time;
 
   s1 = newSequence();
   s1->indegree = 1;
@@ -241,7 +240,7 @@ void build(void)
   int i;
   
   rootTime = lastTime = NULL;
-  newTime = 0.0;
+  double time = 0.0;
   initTerminator();
   initSequencePool();
 
@@ -268,18 +267,18 @@ void build(void)
     double k = seqs_len;
     if (RZ) {
       if (exprate != 0.0) {
-        newTime = newTime + 
-          log(1.0+exprate*exp(-newTime)*-2.0/(k*(k-1))*log(drand48()));
+        time = time + 
+          log(1.0+exprate*exp(-time)*-2.0/(k*(k-1))*log(drand48()));
       }
       else
-        newTime = newTime + exponen(k*(k-1.0)/2.0);
+        time = time + exponen(k*(k-1.0)/2.0);
     } else
-      newTime = newTime + exponen(k*(k-1.0)/2.0+sumA());
+      time = time + exponen(k*(k-1.0)/2.0+sumA());
 
     if (probCoalescens(k))
-      makeCoalescensNode();
+      makeCoalescensNode(time);
     else
-      makeRecombinationNode();
+      makeRecombinationNode(time);
   }
 }
 

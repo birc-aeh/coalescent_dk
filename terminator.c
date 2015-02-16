@@ -311,8 +311,6 @@ bool updateRecombination(double P)
   return true;
 }
 
-debug double newTime;
-  
 void updateCoalescens(double from, double to)
 {
   termList *t;
