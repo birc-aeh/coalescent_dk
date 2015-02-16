@@ -149,7 +149,6 @@ bool updateRecombination(double P)
   if (P>=(double)R/2.0)
     return false;
 
-  /* hashtable speedup */
   termList *t = root;
   
   if (t->z > P) {
@@ -177,12 +176,12 @@ bool updateRecombination(double P)
 void updateCoalescens(double from, double to)
 {
   termList *t = root;
-  while (t!=NULL) {
+  while (t != NULL) {
     if ((t->z >= from) && (t->z < to)) {
       number_with_size[t->k]--;
       t->k--;
       number_with_size[t->k]++;
-      if (t->k==1) {
+      if (t->k == 1) {
 	some_k_became_one = true;
       }
     }
@@ -227,10 +226,6 @@ REALTREE *makeSub(void)
   return result;
 }
 
-
-
-
-
 static REALTREE *makeOneTree(double p)
 {
   int n;
@@ -255,7 +250,7 @@ static REALTREE *makeOneTree(double p)
   n = num_ini_seq;
   tl = rootTime;
 
-  while (n>1) {
+  while (n > 1) {
     tmp = NULL;
     switch (tl->indegree) {
     case 1:
@@ -351,7 +346,8 @@ static REALTREE *makeOneTree(double p)
       exit(1);
     }
 
-    if (n<=1) break;
+    if (n <= 1)
+      break;
     tl = tl->nextTime;
   }
   
@@ -380,20 +376,12 @@ void dumpTree(double z, REALTREE *realtree)
 
 void makeRealTree()
 {
-  termList *t;
-  double p;
-
-  t = root;
-
-  //printf("Here\n");
-  while (t->next!=NULL) {
-    p = (t->z+t->next->z)/2.0;
-
+  termList *t = root;
+  while (t->next != NULL) {
+    double p = (t->z + t->next->z)/2.0;
     dumpTree(t->z, makeOneTree(p));
-
     t = t->next;
-  }   
-  
-  p = (t->z+(R/2.0))/2.0;
+  }
+  double p = (t->z + (R/2.0))/2.0;
   dumpTree(t->z, makeOneTree(p));
 }
