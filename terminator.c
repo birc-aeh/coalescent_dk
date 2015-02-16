@@ -272,7 +272,7 @@ bool updateRecombination(double P)
     exit(1);
   }
 
-  if (P==(double)R/2.0)
+  if (P>=(double)R/2.0)
     return false;
 
   /* hashtable speedup */

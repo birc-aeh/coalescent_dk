@@ -8,8 +8,6 @@ int seqs_len = 0;                /* External - next free slot */
 static int seqs_alloc = 0;
 static SEQUENCE **seqs = NULL;
 
-static bool flipflop = false;    /* When traversing - the state of <visited> */
-
 double sumA(void)
 {
   double res = 0.0;
@@ -21,7 +19,6 @@ double sumA(void)
 
 void initSequencePool(void)
 {
-  flipflop = false;
   seqs_alloc = 1000;
   seqs = malloc(seqs_alloc * sizeof(SEQUENCE*));
 }
@@ -34,7 +31,6 @@ SEQUENCE *newSequence(void)
   SEQUENCE *result;
   result = malloc(sizeof(SEQUENCE));
   result->ID = ID++;
-  result->visited = flipflop;
   result->Time = 0.0;
   result->nextTime = NULL;
   result->reversed = false;
@@ -87,8 +83,7 @@ SEQUENCE *getWeightedSequence(void)
 
   double random = sumA()*drand48();
   double sum = 0.0;
-  int i=0;
-  
+  int i;
   for (i = 0; i < seqs_len; i++)
   {
     SEQUENCE *s = seqs[i];
@@ -107,29 +102,3 @@ void traverseTopSeqs(void (*opr)(SEQUENCE *))
   for (i = 0; i < seqs_len; i++)
     opr(seqs[i]);
 }
-
-/* Graph-traversal help function */
-void handleSeq(SEQUENCE *s, void (*opr)(SEQUENCE *))
-{
-  if (s==NULL) return;
-  if (s->visited==flipflop) return;
-  s->visited = flipflop;
-
-  switch (s->indegree) {
-  case 1:
-    handleSeq(s->son,opr);
-    break;
-  case 2:
-    handleSeq(s->son,opr);
-    handleSeq(s->daughter,opr);
-    break;
-  default:
-    break;
-  }
-
-  if (!(s->indegree==1 && s->outdegree==1))
-    (*opr)(s);
-}
-
-
-
