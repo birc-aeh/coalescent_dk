@@ -7,7 +7,7 @@
 void initTerminator(void);
 bool updateRecombination(double P);
 void updateCoalescens(double from, double to);
-double updateOneK(void);
+double updateOneK(INTERVAL **last_make);
 bool theEnd(void);
 
 

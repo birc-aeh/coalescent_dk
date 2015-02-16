@@ -46,8 +46,6 @@ double getLegalPoint(INTERVAL *i)
   return x1+(drand48()*(yn-x1));
 }
 
-extern INTERVAL *last_make;
-
 void makeCoalescensNode(double time)
 {
   SEQUENCE *s,*s1,*s2;
@@ -84,7 +82,8 @@ void makeCoalescensNode(double time)
 
   putSequence(s);
 
-  double update = updateOneK();  
+  INTERVAL *last_make;
+  double update = updateOneK(&last_make);  
 
   printf("N %i|1|%f|",s->ID,s->Time);
   printf("Time:%f",s->Time);
@@ -228,11 +227,6 @@ void makeRecombinationNode(double time)
     printf("E %i|%i|%i\n",edgeCounter++,r->son->ID,r->ID);
 
 }
-
-/*  static void addTopPoints(SEQUENCE *s) */
-/*  { */
-/*    addRootPoint(s->intervals,s); */
-/*  } */
 
 void build(void)
 {
