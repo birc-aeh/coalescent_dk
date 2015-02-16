@@ -21,8 +21,6 @@ typedef struct jumpList {
 } jumpList;
 
 static termList *root;
-static termList **htable;
-static int hsize;
 static int *number_with_size;
 static int roof;
 static bool some_k_became_one;
@@ -76,12 +74,6 @@ void initTerminator(void)
   number_with_size[num_ini_seq] = 1;
   roof = 1;
   some_k_became_one = false;
-
-  hsize = (R/2)+1;
-  htable = malloc(hsize*sizeof(termList *));
-  for (i=0; i<hsize; i++) 
-    htable[i] = NULL;
-  htable[0] = root;
 
   jlist = NULL;
 }
@@ -263,38 +255,20 @@ INTERVAL *makeIntervals(void)
 
 bool updateRecombination(double P)
 {
-  int i;
-  termList *t;
-  bool setHash;
-
-  if ((int)P>=hsize) {
-    fprintf(stderr,"Terminator problemems!!\n");
-    exit(1);
-  }
-
   if (P>=(double)R/2.0)
     return false;
 
   /* hashtable speedup */
-  setHash = false;
-  t = htable[(int)P];
-  if (t==NULL) {
-    for (i=((int)P)-1; htable[i]==NULL; i--);
-    t = htable[i];
-    setHash = true;
-  }
+  termList *t = root;
   
   if (t->z > P) {
     prependElement(t,P);
-    htable[(int)P] = t->prev;
     return true;
   }
 
   while (t!=NULL) {
     if (t->z > P) {
       prependElement(t,P);
-      if (setHash)
-	htable[(int)P] = t->prev;
       return true;
     }
     if (t->z == P) {
@@ -302,8 +276,6 @@ bool updateRecombination(double P)
     }
     if (t->next==NULL) {
       appendElement(t,P);
-      if (setHash)
-	htable[(int)P] = t->next;
       return true;
     }
     t=t->next;
@@ -313,20 +285,7 @@ bool updateRecombination(double P)
 
 void updateCoalescens(double from, double to)
 {
-  termList *t;
-  int i;
-
-  if ((int)from>=hsize) {
-    fprintf(stderr,"Terminator problemems!!\n");
-    exit(1);
-  }
-
-  t = htable[(int)from];
-  if (t==NULL) {
-    for (i=((int)from)-1; htable[i]==NULL; i--);
-    t = htable[i];
-  }
-    
+  termList *t = root;
   while (t!=NULL) {
     if ((t->z >= from) && (t->z < to)) {
       number_with_size[t->k]--;
