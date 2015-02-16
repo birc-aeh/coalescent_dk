@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 #include "terminator.h"
 #include "tree.h"
 #include "sets.h"
@@ -15,17 +16,10 @@ typedef struct termList {
   REALTREE *realtree;
 } termList;
 
-typedef struct jumpList {
-  termList *from,*to;
-  struct jumpList *prev,*next;
-} jumpList;
-
 static termList *root;
 static int *number_with_size;
 static int roof;
 static bool some_k_became_one;
-
-static jumpList *jlist;
 
 int max(int a, int b)
 {
@@ -74,163 +68,68 @@ void initTerminator(void)
   number_with_size[num_ini_seq] = 1;
   roof = 1;
   some_k_became_one = false;
-
-  jlist = NULL;
 }
 
-static jumpList *removeJumpElement(jumpList *jl)
+static termList *last_k_one_in_this_run(termList *t)
 {
-  if (jl->prev==NULL) {
-    if (jl->next==NULL) {
-      jlist=NULL;
-      return NULL;
-    }
-    jlist = jl->next;
-    jlist->prev = NULL;
-    return jlist;
-  }
-  if (jl->next==NULL) {
-    jl->prev->next=NULL;
-    return jl->prev;
-  }
-  jl->prev->next = jl->next;
-  jl->next->prev = jl->prev;
-  return jl->prev;
+  while (t != NULL && t->next != NULL && t->next->k == 1)
+    t = t->next;
+  return t;
 }
-
-static jumpList *appendJumpElement(jumpList *jl)
+static termList *find_first_k_one_after(termList *t)
 {
-  jumpList *tmp;
-
-  tmp = malloc(sizeof(jumpList));
-  tmp->from = tmp->to = NULL;
-
-  if (jl==NULL) {
-    tmp->prev = tmp->next = NULL;
-    jlist = tmp;
-    return tmp;
-  }
-
-  if (jl->next==NULL) {
-    jl->next = tmp;
-    tmp->prev = jl;
-    tmp->next = NULL;
-    return tmp;
-  }
-
-  tmp->next = jl->next;
-  tmp->next->prev = tmp;
-  tmp->prev = jl;
-  jl->next = tmp;
-  return tmp;
+  t = t->next;
+  while (t != NULL && t->k != 1)
+    t = t->next;
+  return t;
 }
-
-static jumpList *prependJumpElement(jumpList *jl)
-{
-  jumpList *tmp;
-  if (jl==NULL)
-    return appendJumpElement(NULL);
-
-  if (jl->prev!=NULL)
-    return appendJumpElement(jl->prev);
-
-  tmp = appendJumpElement(NULL);
-  tmp->next = jl;
-  tmp->next->prev = tmp;
-  tmp->prev = NULL;
-  return tmp;
-}
-
 
 INTERVAL *makeIntervals(void)
 {
-  int j,size;
+  int j;
   INTERVAL *i;
   INTERVALLIST *il;
-  termList *t;
-  double sum;
-
-  jumpList *jl;
-
-  jl=jlist;
-  while (jl!=NULL) {
-    while (jl->from->prev!=NULL && jl->from->prev->k==1)
-      jl->from = jl->from->prev;
-    while (jl->to->next!=NULL && jl->to->next->k==1) {
-      if (jl->next!=NULL && jl->next->from==jl->to) {
-	jl->next->from = jl->from;
-	jl=removeJumpElement(jl);
-      }
-      else
-	jl->to=jl->to->next;
-    }
-    if (jl->next!=NULL && jl->to==jl->next->from)
-      removeJumpElement(jl->next);
-    jl=jl->next;
-  }
-
-
-  t=root;
-  jl=jlist;
-  while (t!=NULL) {
-    if (t->k==1) {
-      if (jl==NULL) {
-	jl=appendJumpElement(jl);
-	jl->from = t;
-	while (t->next!=NULL && t->next->k==1)
-	  t=t->next;
-	jl->to = t;
-      }
-      else {
-	if (jl->from==t)
-	  t=jl->to;
-	else {
-	  if (t->z<jl->from->z) 
-	    jl=prependJumpElement(jl);
-	  else
-	    jl=appendJumpElement(jl);
-	  jl->from=t;
-	  while (t->next!=NULL && t->next->k==1)
-	    t=t->next;
-	  jl->to=t;
-	}
-      }
-      if (jl->next!=NULL)
-	jl=jl->next;
-    }
-    t=t->next;
-  }
-
-
-  jl=jlist;
-  size = (root==jl->from)?0:1;
-  while (jl!=NULL) {
+  termList *t = root;
+  int size = 0;
+  if (root != NULL && root->k > 1) {
+    t = find_first_k_one_after(t);
     size++;
-    if (jl->next==NULL && jl->to->next==NULL)
+  }
+  while (t != NULL) {
+    termList *to = last_k_one_in_this_run(t);
+    termList *next = find_first_k_one_after(to);
+    size++;
+    if (next == NULL && to->next == NULL)
       size--;
-    jl=jl->next;
+    t = next;
   }
 
-  if (size==0) return NULL;
+  if (size == 0)
+    return NULL;
 
   il = malloc(sizeof(INTERVALLIST)*size);
-  jl=jlist;
-  j=0;
-  if (root!=jl->from) {
+  j = 0;
+  t = root;
+  if (root != NULL && root->k > 1) {
+    t = find_first_k_one_after(t);
     il[0].start = root->z;
-    il[0].end = jl->from->z;
+    il[0].end = t->z;
     j++;
   }
-  while (jl!=NULL) {
-    if (jl->to->next!=NULL) {
-      il[j].start=jl->to->next->z;
-      if (jl->next!=NULL)
-	il[j].end=jl->next->from->z;
+  while (t != NULL) {
+    termList *to = last_k_one_in_this_run(t);
+    /* assert (to == jl->to); */
+    termList *next = find_first_k_one_after(to);
+    /* assert (jl->next == NULL || next == jl->next->from); */
+    if (to->next != NULL) {
+      il[j].start = to->next->z;
+      if (next != NULL)
+	il[j].end = next->z;
       else
-	il[j].end=(double)R/2.0;
+	il[j].end = (double)R/2.0;
     }
     j++;
-    jl=jl->next;
+    t = next;
   }
   for (j=0; j<(size-1); j++) 
     il[j].next = &il[j+1];
@@ -243,13 +142,6 @@ INTERVAL *makeIntervals(void)
   i = malloc(sizeof(INTERVAL));
   i->size = size;
   i->list = il;
-
-  sum = 0.0;
-  il = i->list;
-  for (j=0; j<i->size; j++) {
-    sum += il->end-il->start;
-    il = il->next;
-  }
   return i;
 }
 
