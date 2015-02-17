@@ -1,422 +1,169 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h> /* memcpy */
+#include <assert.h>
 #include "sets.h"
 #include "terminator.h"
+
+extern int R;
 
 static double fmin(double a,double b)
 {
   return (a<b?a:b);
 }
 
-static double fmax(double a, double b)
-{
-  return (a>b?a:b);
-}
-
 /* Make an interval with one entry (<x1>,<y1>). */
 INTERVAL *initInterval(double x1, double y1)
 {
-  INTERVAL *result;
-  result = malloc(sizeof(INTERVAL));
+  INTERVAL *result = malloc(sizeof(INTERVAL));
   result->size = 1;
-  result->list = appendInterval(NULL);
-  result->list->start = x1;
-  result->list->end = y1;
+  result->ranges = malloc(2*sizeof(double));
+  result->ranges[0] = x1;
+  result->ranges[1] = y1;
   return result;
 }
 
 INTERVAL *emptyInterval(void)
 {
-  INTERVAL *result;
-  result = malloc(sizeof(INTERVAL));
+  INTERVAL *result = malloc(sizeof(INTERVAL));
   result->size = 0;
+  result->ranges = NULL;
   return result;
 }
 
 /* Return an exact copy of interval <i>. */
 INTERVAL *copyIntervals(INTERVAL *i)
 {
-  INTERVAL *new;
-  INTERVALLIST *ln,*lo;
-  int j;
-
-  new = malloc(sizeof(INTERVAL));
+  size_t byte_size = 2*i->size*sizeof(double);
+  INTERVAL *new = malloc(sizeof(INTERVAL));
   new->size = i->size;
-  lo = i->list;
-  ln = NULL;
-  for (j=0; j<new->size; j++) {
-    ln = appendInterval(ln);
-    ln->start = lo->start;
-    ln->end = lo->end;
-    lo = lo->next;
-  }
-  if (ln!=NULL)
-    new->list = ln->next;
-  else
-    new->list = NULL;
+  new->ranges = malloc(byte_size);
+  memcpy(new->ranges, i->ranges, byte_size);
   return new;
 }
 
 /* Return start-point of first part-interval in <i>. */
 double getX1(INTERVAL *i)
 {
-  return i->list->start;
+  assert(i->size > 0);
+  return i->ranges[0];
 }
 
 /* Return end-point of last part-interval in <i>. */
 double getYn(INTERVAL *i)
 {
-  return i->list->prev->end;
+  assert(i->size > 0);
+  return i->ranges[2*i->size-1];
 }
 
-/* Insert new element after <i>, returning */
-/* a reference to the new element.         */
-INTERVALLIST *appendInterval(INTERVALLIST *i)
+static INTERVAL *merge_intervals(INTERVAL *a, INTERVAL *b, int limit)
 {
-  if (i!=NULL) {
-    INTERVALLIST *new;
-    new = malloc(sizeof(INTERVALLIST));
-    new->next = i->next;
-    new->prev = i;
-    i->next = new;
-    new->next->prev = new;
-    i = new;
-  } 
-  else {
-    i = malloc(sizeof(INTERVALLIST));
-    i->next = i->prev = i;
+  int new_size = (a->size + b->size)*2;
+  int count = 0;
+  INTERVAL *res = malloc(sizeof(INTERVAL));
+  res->ranges = malloc(new_size*sizeof(double));
+  int i = 0, j = 0, k = 0;
+  double r = 0.0;
+  while (i < 2*a->size || j < 2*b->size) {
+    double A = i >= 2*a->size? R : a->ranges[i];
+    double B = j >= 2*b->size? R : b->ranges[j];
+    int new_count = count;
+    r = fmin(A,B);
+    if (A <= B) {
+      new_count += (i % 2 == 0? 1 : -1);
+      i += 1;
+    }
+    if (A >= B) {
+      new_count += (j % 2 == 0? 1 : -1);
+      j += 1;
+    }
+    if ((count <= limit && new_count > limit)
+        || (count > limit && new_count <= limit))
+      res->ranges[k++] = r;
+    count = new_count;
   }
-  return i;
+  assert(k % 2 == 0);
+  res->size = k/2;
+  return res;
 }
-
-/* Insert new element after <i>, returning */
-/* a reference to the new element.         */
-INTERVALLIST *prependInterval(INTERVALLIST *i)
-{
-  if (i!=NULL) {
-    INTERVALLIST *new;
-    new = malloc(sizeof(INTERVALLIST));
-    new->next = i;
-    new->prev = i->prev;
-    i->prev = new;
-    new->prev->next = new;
-    i = new;
-  }
-  else {
-    i = malloc(sizeof(INTERVALLIST));
-    i->next = i->prev = i;
-  }
-  return i;
-}
-
-/* Copy values in <source> interval to <dest> interval */
-void cloneInterval(INTERVALLIST *dest, INTERVALLIST *source)
-{
-  dest->start = source->start;
-  dest->end = source->end;
-}
-
 
 /* Unite intervals <i1> with <i2> */
 INTERVAL *unite(INTERVAL *i1, INTERVAL *i2, coal_callback cb)
 {
-  INTERVAL *i;
-  INTERVALLIST *result,*il1,*il2;
-  int size,pos1,pos2;
-  double seen;
-  bool success;
-
-  /* Update terminator */
-  il1 = i1->list;
-  il2 = i2->list;
-  pos1=0; pos2=0;
-  
-  while ((pos1<i1->size) && (pos2<i2->size)) {
-    if ((il1->end > il2->start) && (il1->end <= il2->end)) {
-      cb(fmax(il1->start,il2->start),il1->end);
-      il1 = il1->next;
-      pos1++;
-    }
-    else if ((il2->end > il1->start) && (il2->end <= il1->end)) {
-      cb(fmax(il1->start,il2->start),il2->end);
-      il2 = il2->next;
-      pos2++;
-    }
-    else if (il1->end <= il2->start) {
-      il1 = il1->next;
-      pos1++;
-    }
-    else {
-      il2 = il2->next;
-      pos2++;
-    }
-  }
-  
-  /* Build united interval list */
-  il1 = i1->list;
-  il2 = i2->list;
-  result = NULL;
-  pos1=0; pos2=0; size=0; seen=0.0;
-
-  while ((pos1<i1->size) && (pos2<i2->size)) {
-    result = appendInterval(result);
-    size++;
-    if (il1->start < il2->start) {
-      result->start = il1->start;
-      seen = il1->end;
-    }
-    else {
-      result->start = il2->start;
-      seen = il2->end;
-    }
-
-    success = true;
-    while (success) {
-      if ((seen >= il1->start) && (seen <= il1->end) && (pos1<i1->size)) {	
-	seen = il1->end;
-	il1 = il1->next;
-	pos1++;
-      }
-      else if ((seen >= il2->start) && (seen <= il2->end) && (pos2<i2->size)) {
-	seen = il2->end;
-	il2 = il2->next;
-	pos2++;
-      }
-      else 
-	success = false;
-      
-      while ((il1->end < seen) && (pos1 < i1->size)) {
-	il1 = il1->next;
-	pos1++;
-      }
-      while ((il2->end < seen) && (pos2 < i2->size)) {
-	il2 = il2->next;
-	pos2++;
-      }
-
-      if (!success) 
-	result->end = seen;
-    }
-  }
-
-  while (pos1<i1->size) {
-    result = appendInterval(result);
-    size++;
-    cloneInterval(result,il1);
-    il1 = il1->next;
-    pos1++;
-  }
-
-  while (pos2<i2->size) {
-    result = appendInterval(result);
-    size++;
-    cloneInterval(result,il2);
-    il2 = il2->next;
-    pos2++;
-  }
-
-  i = malloc(sizeof(INTERVAL));
-  i->size = size;
-  i->list = (result==NULL ? NULL:result->next);
-
-  return i;
+  INTERVAL *res = merge_intervals(i1, i2, 0);
+  INTERVAL *intersection = merge_intervals(i1, i2, 1);
+  int i = 0;
+  for (; i < 2*intersection->size; i += 2)
+    cb(intersection->ranges[i], intersection->ranges[i+1]);
+  free(intersection->ranges);
+  free(intersection);
+  return res;
 }
 
-void dummy_coal_update(double a, double b)
-{
-}
 /* Unite without updating terminator */
 INTERVAL *uniteNoTerm(INTERVAL *i1, INTERVAL *i2)
 {
-    return unite(i1, i2, dummy_coal_update);
+    return merge_intervals(i1, i2, 0);
 }
-
 
 /* Intersect intervals <dest> with <i>. */
 void intersect(INTERVAL *dest, INTERVAL *i)
 {
-  INTERVALLIST *il2;
-  INTERVALLIST *il1;
-  INTERVALLIST *result;
-
-  int pos1,pos2,size;
-  bool success;
-
-  il1 = dest->list;
-  il2 = i->list;
-  result = NULL;
-
-  pos1=0; pos2=0; size=0;
-  while (pos1<dest->size) {
-    success = true;
-    while (success) {
-      success = false;
-      if ((il1->start >= il2->start) && (il1->start < il2->end)) {
-	result = appendInterval(result);
-	size++;
-	result->start = il1->start;
-	result->end = fmin(il1->end,il2->end);
-      }
-      else if ((il1->end > il2->start) && (il1->end <= il2->end)) {
-	result = appendInterval(result);
-	size++;
-	result->start = fmax(il2->start,il2->start);
-	result->end = il1->end;
-      }
-      else if ((il2->start > il1->start) && (il2->end < il1->end)) {
-	result = appendInterval(result);
-	size++;
-	result->start = il2->start;
-	result->end = il2->end;
-      }
-      if (il1->end > il2->end) {
-	il2 = il2->next;
-	pos2++;
-	if (pos2==i->size)
-	  pos1=dest->size;
-	else
-	  success = true;
-      }
-
-    }
-    il1 = il1->next;
-    pos1++;
-  }
-
-  dest->list = (result==NULL ? NULL:result->next);
-  dest->size = size;
-
+  INTERVAL *res = merge_intervals(dest, i, 1);
+  dest->ranges = res->ranges;
+  dest->size = res->size;
 }
-
 
 /* Make copy af intervals in <i1> up to point <P>. */
 INTERVAL *intersectTo(INTERVAL *i1, double P)
 {
-  INTERVAL *result;
-  INTERVALLIST *i,*l;
-  int j;
-
-  result = malloc(sizeof(INTERVAL));
-  result->size = 0;
-  i = NULL;
-
-  l = i1->list;
-  for (j=0; j<i1->size; j++) {
-    if (l->end <= P) {
-      i = appendInterval(i);
-      result->size++;
-      cloneInterval(i,l);
-      l = l->next;
-    }
-    else if (l->start < P) {
-      i = appendInterval(i);
-      result->size++;
-      i->start = l->start;
-      i->end = P;
-      result->list = i->next;
-      return result;
-    }
-    else 
-      break;
-  }
-  result->list = (i==NULL ? NULL:i->next);
-  return result;
+  double range[] = {0, P};
+  INTERVAL tmp = {1, range};
+  return merge_intervals(i1, &tmp, 1);
 }
 
 /* Make a copy of intervals in <i1> starting at point <P>. */
 INTERVAL *intersectFrom(INTERVAL *i1, double P)
 {
-  INTERVAL *result;
-  INTERVALLIST *i,*l;
-  int j;
-  
-  result = malloc(sizeof(INTERVAL));
-  result->size = 0;
-  i = NULL;
-
-  if (i1->size > 0) {
-    l = i1->list->prev;
-    for (j=0; j<i1->size; j++) {
-      if (l->start >= P) {
-	i = prependInterval(i);
-	result->size++;
-	cloneInterval(i,l);
-	l = l->prev;
-      }
-      else if (l->end > P) {
-	i = prependInterval(i);
-	result->size++;
-	i->start = P;
-	i->end = l->end;
-	result->list = i;
-	return result;
-      }
-      else 
-	break;
-    }
-  }
-  result->list = i;
-  return result;
+  double range[] = {P, R/2.0};
+  INTERVAL tmp = {1, range};
+  return merge_intervals(i1, &tmp, 1);
 }
-
-extern int R;
 
 INTERVAL *inverse(INTERVAL *i1)
 {
-  INTERVALLIST *il,*result;
-  INTERVAL *i;
-  int pos,size;
+  if (i1->size == 0)
+    return initInterval(0.0, R/2.0);
 
-  il = i1->list;
-  pos = 0; size = 0;
-  result = NULL;
+  int len = i1->size;
+  int first_is_bot = i1->ranges[0] <= 0.0;
+  int last_is_top = i1->ranges[i1->size*2 - 1] >= R/2.0;
+  int dst_off = first_is_bot? 0 : 1;
+  int src_off = first_is_bot? 1 : 0;
+  int to_copy = len*2;
+  if (first_is_bot)
+    to_copy -= 1;
+  if (last_is_top)
+    to_copy -= 1;
 
-  if (i1->size==0)
-    return NULL;
+  INTERVAL *res = malloc(sizeof(INTERVAL));
+  res->size = len + 1 - first_is_bot - last_is_top;
+  res->ranges = malloc(res->size*2*sizeof(double));
 
-  if (il->start!=0.0) {
-    result = appendInterval(result);
-    result->start = 0.0;
-    result->end = il->start;
-    size++;
-  }
-
-  while (pos<i1->size) {
-    if (il->end==(double)R/2.0) {
-      break;
-    }
-    result = appendInterval(result);
-    size++;
-    result->start = il->end;
-    if (il->next->start < il->end) 
-      result->end = R/2.0;
-    else
-      result->end = il->next->start;
-    il=il->next;
-    pos++;
-  }
-      
-  i = malloc(sizeof(INTERVAL));
-  i->size = size;
-  i->list = (size==0)?NULL:result->next;
-  return i;
+  res->ranges[0] = 0.0;
+  memcpy(res->ranges+dst_off, i1->ranges+src_off, to_copy*sizeof(double));
+  if (!last_is_top)
+    res->ranges[2*res->size - 1] = R/2.0;
+  return res;
 }
 
 void prettyInterval(INTERVAL *i)
 {
-  INTERVALLIST *l;
-  int j;
-
   if (i==NULL) {
     printf("<null>\n");
     return;
   }
-
-  l = i->list;
-  for (j=0; j<i->size; j++) {
-    printf("%f,%f#",l->start,l->end);
-    //if (j<i->size-1) printf("#");
-    l = l->next;
-  }
-  //printf("\n");
+  int j;
+  for (j=0; j < 2*i->size; j += 2)
+    printf("%f,%f#",i->ranges[j],i->ranges[j+1]);
 }

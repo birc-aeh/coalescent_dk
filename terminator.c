@@ -83,9 +83,6 @@ static termList *find_first_k_one_after(termList *t)
 
 INTERVAL *makeIntervals(void)
 {
-  int j;
-  INTERVAL *i;
-  INTERVALLIST *il;
   termList *t = root;
   int size = 0;
   if (root != NULL && root->k > 1) {
@@ -104,13 +101,13 @@ INTERVAL *makeIntervals(void)
   if (size == 0)
     return NULL;
 
-  il = malloc(sizeof(INTERVALLIST)*size);
-  j = 0;
+  double *il = malloc(sizeof(double)*2*size);
+  int j = 0;
   t = root;
   if (root != NULL && root->k > 1) {
     t = find_first_k_one_after(t);
-    il[0].start = root->z;
-    il[0].end = t->z;
+    il[0] = root->z;
+    il[1] = t->z;
     j++;
   }
   while (t != NULL) {
@@ -119,32 +116,24 @@ INTERVAL *makeIntervals(void)
     termList *next = find_first_k_one_after(to);
     /* assert (jl->next == NULL || next == jl->next->from); */
     if (to->next != NULL) {
-      il[j].start = to->next->z;
+      il[2*j] = to->next->z;
       if (next != NULL)
-	il[j].end = next->z;
+	il[2*j+1] = next->z;
       else
-	il[j].end = (double)R/2.0;
+	il[2*j+1] = R/2.0;
     }
     j++;
     t = next;
   }
-  for (j=0; j<(size-1); j++) 
-    il[j].next = &il[j+1];
-  il[size-1].next = &il[0];
-
-  for (j=1; j<size; j++)
-    il[j].prev = &il[j-1];
-  il[0].prev = &il[size-1];
-
-  i = malloc(sizeof(INTERVAL));
+  INTERVAL *i = malloc(sizeof(INTERVAL));
   i->size = size;
-  i->list = il;
+  i->ranges = il;
   return i;
 }
 
 bool updateRecombination(double P)
 {
-  if (P>=(double)R/2.0)
+  if (P >= R/2.0)
     return false;
 
   termList *t = root;
@@ -188,7 +177,6 @@ void updateCoalescens(double from, double to)
     }
     t = t->next;
   }
-
 }
 
 double updateOneK(INTERVAL **last_make)

@@ -9,6 +9,11 @@
 typedef int bool;
 #endif
 
+typedef struct INTERVAL {
+  int size;
+  double *ranges;
+} INTERVAL;
+
 typedef struct SEQUENCE {
   
   int ID;
@@ -35,17 +40,6 @@ typedef struct SEQUENCE {
   struct INTERVAL *intervals;
   struct INTERVAL *gray;
 } SEQUENCE;
-
-
-typedef struct INTERVAL {
-  int size;
-  struct INTERVALLIST *list;
-} INTERVAL;
-
-typedef struct INTERVALLIST {
-  double start,end;
-  struct INTERVALLIST *prev,*next;
-} INTERVALLIST;
 
 typedef struct REALTREE {
   double time;

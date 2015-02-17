@@ -22,11 +22,4 @@ double getYn(INTERVAL *i);
 
 void prettyInterval(INTERVAL *i);
 
-
-/* Private */
-INTERVALLIST *appendInterval(INTERVALLIST *i);
-INTERVALLIST *prependInterval(INTERVALLIST *i);
-INTERVALLIST *removeInterval(INTERVALLIST *i);
-void cloneInterval(INTERVALLIST *dest, INTERVALLIST *source);
-
 #endif

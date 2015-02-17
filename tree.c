@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include <math.h>
 #include "tree.h"
 #include "structures.h"
@@ -186,7 +187,7 @@ void makeRecombinationNode(double time)
     s1->intervals = intersectTo(r->intervals,P);
     s2->intervals = intersectFrom(r->intervals,P);
   
-    if (getYn(s1->intervals)==P) {
+    if (getYn(s1->intervals) == P) {
       goodP = updateRecombination(P);
     }
     else
@@ -268,6 +269,7 @@ void build(void)
         time = time + exponen(k*(k-1.0)/2.0);
     } else
       time = time + exponen(k*(k-1.0)/2.0+sumA());
+    assert(time > 0.0);
 
     if (probCoalescens(k))
       makeCoalescensNode(time);
