@@ -14,8 +14,9 @@ all: $(HEADERS) $(OBJS)
 clean:
 	rm -f $(OBJS) $(HOGOBJS) *~
 
-depend:
-	depend $(OBJS)
+test: $(HEADERS) $(OBJS)
+	$(CC) $(CFLAGS) -std=gnu99 test/test_sets.c -o runtests sets.o
+	./runtests
 
 
 # DO NOT ERASE THIS COMMENT
