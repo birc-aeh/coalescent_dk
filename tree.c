@@ -95,8 +95,7 @@ void makeCoalescensNode(double time)
   printf(" |");
 
   if (update >= 0.0) {
-
-    if (last_make!=NULL) {
+    if (last_make != NULL) {
       i = inverse(last_make);
       intersect(i,uniteNoTerm(s1->intervals,s2->intervals));
       prettyInterval(i);
@@ -104,7 +103,6 @@ void makeCoalescensNode(double time)
       i = uniteNoTerm(s1->intervals,s2->intervals);
       prettyInterval(i);
     }
-
   }
 
   printf(" |");
@@ -138,7 +136,6 @@ void makeCoalescensNode(double time)
   else
     printf("E %d|%d|%d\n",edgeCounter++,s->daughter->ID,s->ID);
 }
-
 
 void makeRecombinationNode(double time)
 {
@@ -226,7 +223,6 @@ void makeRecombinationNode(double time)
   }
   else
     printf("E %i|%i|%i\n",edgeCounter++,r->son->ID,r->ID);
-
 }
 
 void build(void)
@@ -256,8 +252,7 @@ void build(void)
   }
 
   while (!theEnd()) {
-    if (seqs_len == 1)
-      printf("One size!!\n");
+    assert(seqs_len > 1);
 
     double k = seqs_len;
     if (RZ) {
@@ -278,7 +273,6 @@ void build(void)
   }
 }
 
-
 INTERVAL *the_intervals;
 
 void intersectOne(SEQUENCE *s)
@@ -293,7 +287,3 @@ void intersectAll(INTERVAL *i)
   the_intervals = i;
   traverseTopSeqs(intersectOne);
 }
-
-
-
-
