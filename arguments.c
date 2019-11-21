@@ -6,7 +6,6 @@
 #include "arguments.h"
 
 int num_ini_seq;      /* Number of initial sequences            */
-int runs;
 int seed;
 double M1,M2;
 
@@ -15,7 +14,6 @@ void parseArguments(int argc, char **argv)
   char *c;
 
   num_ini_seq = 5;
-  runs = 100;
   seed = time(NULL);
 
   M1 = 0.5;
@@ -24,10 +22,6 @@ void parseArguments(int argc, char **argv)
   for (argc--;argc>0;argc--) {
     c = argv[argc];
     while (1) {
-      if (strncmp("runs=",c,5)==0) {
-	runs = atoi(c+5);
-	break;
-      }
       if (strncmp("seed=",c,5)==0) {
 	seed = atoi(c+5);
 	break;

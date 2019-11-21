@@ -9,16 +9,8 @@
 #include "terminator.h"
 #include "arguments.h"
 
-extern int num_ini_seq;
-extern int runs;
-extern int seed;
-
 int main(int argc, char **argv) 
 {
-/*    int i,max,index; */
-/*    FILE *f; */
-
-
   parseArguments(argc,argv);
 
   printf("Migration\n");
