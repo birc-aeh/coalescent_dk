@@ -7,22 +7,17 @@ extern int alloc_size;
 
 typedef struct SeqArrayPointer {
   SEQUENCE **array;
-  double thisA;
   struct SeqArrayPointer *next,*prev;
 } SeqArrayPointer;
 
-double sumA;                           /* External                  */
 int size;                             /* External - next free slot */
 int type0;
 
 static bool flipflop;                 /* When traversing - the state of <visited> */
 static SeqArrayPointer *root,*last;   /* The root and active sequence array       */
 
-void recalculateThisA(SeqArrayPointer *sap);  /* prototype */
-
 void initSequencePool(void)
 {
-  sumA = 0.0;
   size = 0;
   type0 = 0;
 
@@ -30,7 +25,6 @@ void initSequencePool(void)
   
   root = last = NEW(SeqArrayPointer);
   root->array = calloc(alloc_size, sizeof(SEQUENCE *));
-  root->thisA = 0.0;
   root->next = NULL;
   root->prev = root;
 }
@@ -60,15 +54,12 @@ void putSequence(SEQUENCE *s)
 {
   int i;
 
-  sumA += s->A;
-
   if (size%alloc_size==0 && size>0) {
     if (last->next==NULL) {
       last->next = NEW(SeqArrayPointer);
       last->next->array = calloc(alloc_size, sizeof(SEQUENCE *));
       for (i=0; i<alloc_size; i++)
 	last->next->array[i] = NULL;
-      last->next->thisA = 0.0;
       last->next->next = NULL;
       last->next->prev = last;
     }
@@ -76,7 +67,6 @@ void putSequence(SEQUENCE *s)
   }
   
   last->array[size%alloc_size] = s;
-  last->thisA += s->A;
 
   if (s->type == 0) type0++;
   size++;
@@ -103,20 +93,11 @@ SEQUENCE *getSequence(int i)
   size--;
 
   table->array[i%alloc_size] = last->array[size%alloc_size];
-  table->thisA += last->array[size%alloc_size]->A;
   last->array[size%alloc_size] = NULL;
 
   if (size%alloc_size == 0) {
-    last->thisA = 0.0;
     last = last->prev;
   }
-  else {
-    if (last!=table)
-      recalculateThisA(last);
-  }
-
-  recalculateThisA(table);
-  recalculateA();
 
   if (result->type == 0) type0--;
   return result;
@@ -144,57 +125,6 @@ SEQUENCE *getSequenceWithType(int type)
   }
 
   return NULL;
-}
-
-
-/* Recalculate A for one block */
-void recalculateThisA(SeqArrayPointer *sap)
-{
-  int i;
-
-  sap->thisA = 0.0;
-  for(i=0;i<alloc_size;i++) {
-    if (sap->array[i]==NULL) return;
-    sap->thisA += sap->array[i]->A;
-  }
-}
-
-/* Recalculate sumA based on block values */
-void recalculateA(void)
-{
-  SeqArrayPointer *sap;
-
-  sumA = 0.0;
-  sap = root;
-  while(sap!=NULL) {
-    sumA += sap->thisA;
-    sap = sap->next;
-  }
-}
-
-/* Recalculate sumA and block values based on all sequences */
-void recalculateAllA(void)
-{
-  SeqArrayPointer *sap;
-  int j;
-  double thisA;
-
-  sumA = 0.0;
-  
-  sap = root;
-  while (sap!=NULL) {
-    thisA = 0.0;
-    for (j=0; j<alloc_size; j++) {
-      if (sap->array[j]==NULL) {
-	sap->thisA = thisA;
-	return;
-      }
-      sumA += sap->array[j]->A;
-      thisA += sap->array[j]->A;
-    }
-    sap->thisA = thisA;
-    sap = sap->next;
-  }
 }
 
 /* Iterate through the sequences in the structure, */

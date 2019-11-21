@@ -9,9 +9,6 @@ void putSequence(SEQUENCE *s);
 
 SEQUENCE *getSequence(int i);
 
-void recalculateA(void);
-void recalculateAllA(void);
-
 void traverseTopSeqs(void (*opr)(SEQUENCE *));
 
 SEQUENCE *getSequenceWithType(int type);

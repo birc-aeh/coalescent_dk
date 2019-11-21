@@ -11,7 +11,6 @@ extern int num_ini_seq;   /* Number of initial sequences */
 extern int R;             /* Rekombination-rate */
 extern int RZ;
 
-extern double sumA;      /* The global A                           */
 extern int size;         /* Number of sequences to choose from (k) */
 extern double newTime;   /* Elapsed time (backwards)               */
 
@@ -268,7 +267,6 @@ void intersectAll(INTERVAL *i)
   if (i==NULL) return;
   the_intervals = i;
   traverseTopSeqs(intersectOne);
-  recalculateAllA();
 }
 
 
