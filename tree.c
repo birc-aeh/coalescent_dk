@@ -175,10 +175,8 @@ void build(void)
     printf("|\n");
   }
 
-  i = num_ini_seq;
   while (!is_last()) {
-    if (seqs_len==1)
-      printf("One size!!\n");
+    assert(seqs_len > 1);
 
     int type0 = seqs_of_type0;
     type1 = (seqs_len-type0);
@@ -205,7 +203,6 @@ void build(void)
     default:
       printf("Bad event\n");
     }
-
   }
 }
 
