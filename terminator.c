@@ -27,19 +27,6 @@ void initTerminator(void)
   some_k_became_one = false;
 }
 
-INTERVAL *makeIntervals(void)
-{
-  int size = 0;
-  if (root_k > 1) {
-    size++;
-  }
-
-  if (size == 0)
-    return NULL;
-
-  assert(0);
-}
-
 void updateCoalescens(double from, double to)
 {
   if ((root_z >= from) && (root_z < to)) {
@@ -57,7 +44,7 @@ INTERVAL *last_make;
 double updateOneK(void)
 {
   if (some_k_became_one) {
-    last_make = makeIntervals();
+    last_make = NULL;
     intersectAll(last_make);
     some_k_became_one = false;
     return matleft;
