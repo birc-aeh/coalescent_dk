@@ -408,7 +408,6 @@ static REALTREE *makeOneTree(double p)
   int n;
   SEQUENCE *tmp;
   SEQUENCE *tl;
-  REALTREE *result;
 
   /* Clear the tree  */
   tmp = rootTime;
@@ -427,7 +426,6 @@ static REALTREE *makeOneTree(double p)
   }
   n = num_ini_seq;
   tl = rootTime;
-  result = NULL;
 
   while (n>1) {
     tmp = NULL;
