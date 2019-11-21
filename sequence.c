@@ -122,49 +122,6 @@ SEQUENCE *getSequence(int i)
   return result;
 }  
 
-/* Get a totally random sequence. */
-SEQUENCE *getSomeSequence(void)
-{
-  if (size>0)
-    return getSequence(rand()%size);
-  else
-    return NULL;
-}
-
-/* Get a random sequence where each sequence has weight A/sumA */
-SEQUENCE *getWeightedSequence(void)
-{
-  SeqArrayPointer *sap;
-  double random,sum,old;
-  int i,j;
-
-  if (size==0) return NULL;
-
-  random = sumA*drand48();
-  sum = 0.0;
-  sap = root;
-  i=0;
-  
-  while (1) {
-    old = sum;
-    sum += sap->thisA;
-    if (random<=sum) {
-      sum = old;
-      for (j=0; j<alloc_size; j++) {
-	sum += sap->array[j]->A;
-	if (random<=sum) 
-	  return getSequence(i);
-	i++;
-      }
-    }
-    else
-      i += alloc_size;
-
-    sap = sap->next;
-  }
-}
-
-
 SEQUENCE *getSequenceWithType(int type)
 {
   int num,i,j;
@@ -253,26 +210,6 @@ void traverseTopSeqs(void (*opr)(SEQUENCE *))
       if (sap->array[j]==NULL) 
 	return;
       opr(sap->array[j]);
-    }
-    sap = sap->next;
-  }
-}
-
-/* Iterate through all sequences in the graph, */
-/* calling function <opr> with each sequence.  */
-void traverseSeqs(void (*opr)(SEQUENCE *))
-{
-  SeqArrayPointer *sap;
-  int j;
-  sap = root;
-
-  flipflop = !flipflop;
-
-  while (sap!=NULL) {
-    for (j=0; j<alloc_size; j++) {
-      if (sap->array[j]==NULL)
-	return;
-      handleSeq(sap->array[j],opr);
     }
     sap = sap->next;
   }

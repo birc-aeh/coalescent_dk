@@ -82,39 +82,6 @@ INTERVALLIST *appendInterval(INTERVALLIST *i)
   return i;
 }
 
-/* Insert new element after <i>, returning */
-/* a reference to the new element.         */
-INTERVALLIST *prependInterval(INTERVALLIST *i)
-{
-  if (i!=NULL) {
-    INTERVALLIST *new;
-    new = NEW(INTERVALLIST);
-    new->next = i;
-    new->prev = i->prev;
-    i->prev = new;
-    new->prev->next = new;
-    i = new;
-  }
-  else {
-    i = NEW(INTERVALLIST);
-    i->next = i->prev = i;
-  }
-  return i;
-}
-
-/* Remove element i, returning a reference */
-/* to the element before <i>.              */
-INTERVALLIST *removeInterval(INTERVALLIST *i)
-{
-  INTERVALLIST *dead;
-  if (i==NULL) return NULL;
-  dead = i;
-  i = i->prev;
-  i->next = dead->next;
-  dead->next->prev = i;
-  return i;
-}
-
 /* Copy values in <source> interval to <dest> interval */
 void cloneInterval(INTERVALLIST *dest, INTERVALLIST *source)
 {
@@ -363,75 +330,6 @@ void intersect(INTERVAL *dest, INTERVAL *i)
   dest->list = (result==NULL ? NULL:result->next);
   dest->size = size;
 
-}
-
-
-/* Make copy af intervals in <i1> up to point <P>. */
-INTERVAL *intersectTo(INTERVAL *i1, double P)
-{
-  INTERVAL *result;
-  INTERVALLIST *i,*l;
-  int j;
-
-  result = NEW(INTERVAL);
-  result->size = 0;
-  i = NULL;
-
-  l = i1->list;
-  for (j=0; j<i1->size; j++) {
-    if (l->end <= P) {
-      i = appendInterval(i);
-      result->size++;
-      cloneInterval(i,l);
-      l = l->next;
-    }
-    else if (l->start < P) {
-      i = appendInterval(i);
-      result->size++;
-      i->start = l->start;
-      i->end = P;
-      result->list = i->next;
-      return result;
-    }
-    else 
-      break;
-  }
-  result->list = (i==NULL ? NULL:i->next);
-  return result;
-}
-
-/* Make a copy of intervals in <i1> starting at point <P>. */
-INTERVAL *intersectFrom(INTERVAL *i1, double P)
-{
-  INTERVAL *result;
-  INTERVALLIST *i,*l;
-  int j;
-  
-  result = NEW(INTERVAL);
-  result->size = 0;
-  i = NULL;
-
-  l = i1->list->prev;
-  for (j=0; j<i1->size; j++) {
-    if (l->start >= P) {
-      i = prependInterval(i);
-      result->size++;
-      cloneInterval(i,l);
-      l = l->prev;
-    }
-    else if (l->end > P) {
-      i = prependInterval(i);
-      result->size++;
-      i->start = P;
-      i->end = l->end;
-      result->list = i;
-      return result;
-    }
-    else 
-      break;
-  }
-  result->list = i;
-  return result;
 }
 
 extern int R;

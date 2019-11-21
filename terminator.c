@@ -32,38 +32,6 @@ static jumpList *jlist;
 
 static double matleft;
 
-int max(int a, int b)
-{
-  return a>b ? a:b;
-}
-
-void prependElement(termList *t,double z)
-{
-  termList *n;
-  n = NEW(termList);
-  n->prev = t->prev;
-  n->prev->next = n;
-  n->next = t;
-  n->next->prev = n;
-  n->z = z;
-  n->k = n->prev->k;
-  number_with_size[t->prev->k]++;
-  roof++;
-}
-
-void appendElement(termList *t,double z)
-{
-  termList *n;
-  n = NEW(termList);
-  n->next = NULL;
-  n->prev = t;
-  n->prev->next = n;
-  n->z = z;
-  n->k = n->prev->k;
-  number_with_size[t->k]++;
-  roof++;
-}
-
 void initTerminator(void)
 {
   int i;
@@ -266,56 +234,6 @@ INTERVAL *makeIntervals(void)
   return i;
 }
 
-bool updateRecombination(double P)
-{
-  int i;
-  termList *t;
-  bool setHash;
-
-  if ((int)P>=hsize) {
-    fprintf(stderr,"Terminator problemems!!\n");
-    exit(1);
-  }
-
-  if (P==(double)R/2.0)
-    return false;
-
-  /* hashtable speedup */
-  setHash = false;
-  t = htable[(int)P];
-  if (t==NULL) {
-    for (i=((int)P)-1; htable[i]==NULL; i--);
-    t = htable[i];
-    setHash = true;
-  }
-  
-  if (t->z > P) {
-    prependElement(t,P);
-    htable[(int)P] = t->prev;
-    return true;
-  }
-
-  while (t!=NULL) {
-    if (t->z > P) {
-      prependElement(t,P);
-      if (setHash)
-	htable[(int)P] = t->prev;
-      return true;
-    }
-    if (t->z == P) {
-      return false;
-    }
-    if (t->next==NULL) {
-      appendElement(t,P);
-      if (setHash)
-	htable[(int)P] = t->next;
-      return true;
-    }
-    t=t->next;
-  }
-  return true;
-}
-
 debug double newTime;
   
 void updateCoalescens(double from, double to)
@@ -368,18 +286,6 @@ double updateOneK(void)
 bool theEnd(void)
 {
   return (number_with_size[1]==roof);
-}
-
-
-void prettyTerm(void)
-{
-  
-  termList *t;
-  t = root;
-  while (t!=NULL) {
-    printf("%f:%i\n",t->z,t->k);
-    t = t->next;
-  }
 }
 
 
@@ -582,25 +488,6 @@ int depthtree(REALTREE *t) {
       return rd+1;
   }
 }
-
-void printtree(REALTREE *t, FILE *treeFILE) {
-  int mdepth = depthtree(t)-1;
-  int n = num_ini_seq;
-  int curline = 0,j;
-  char **display = (char **) calloc((n*2-1), sizeof(char *));
-  for(j=0; j<2*n-1; j++) {
-    display[j] = (char *) calloc((bl*(mdepth+1) + 7), sizeof(char));
-    memset(display[j], ' ', bl*(1+mdepth) + 6);
-    display[j][bl*(1+mdepth)] = '\0';
-  }
-  printtree_r(display, mdepth,t, 0, &curline);
-  for(j=0; j<2*n-1; j++)
-    fprintf(treeFILE, "%s\n", display[j]);
-  for(j=0; j<2*n-1; j++)
-    free(display[j]);
-  free(display);
-}
-
 
 void printAlltree(REALTREE *t) {
   if (t!=NULL) {

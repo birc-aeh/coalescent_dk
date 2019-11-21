@@ -45,16 +45,6 @@ int nextEvent(void)
 }
 
 
-bool probCoalescens(void)
-{
-  double sz;
-
-  if (RZ) return 1;
-  sz = (double)size;
-  sz = (sz*(sz-1.0))/(sz*(sz-1.0)+2.0*sumA);
-  return (drand48()<sz);
-}
-
 double computeA(INTERVAL *i)
 {
   if (i->size==0)
@@ -65,14 +55,6 @@ double computeA(INTERVAL *i)
 double exponen(double f)
 {
   return -log(drand48())/f;
-}
-
-double getLegalPoint(INTERVAL *i)
-{
-  double x1,yn;
-  x1 = getX1(i);
-  yn = getYn(i);
-  return x1+(drand48()*(yn-x1));
 }
 
 extern INTERVAL *last_make;
@@ -204,93 +186,6 @@ void makeMigrationNode(int type)
 }
 
 
-void makeRecombinationNode(void)
-{
-  SEQUENCE *s,*r,*s1,*s2;
-  double P;
-  bool goodP;
-
-  s = getWeightedSequence();
-  s->outdegree = 1;
-
-  r = newSequence();
-  r->indegree = 1;
-  r->outdegree = 2;
-  r->son = s;
-  r->intervals = copyIntervals(s->intervals);
-  s->father = r;
-
-  if (lastTime==NULL) {
-    lastTime = r;
-    rootTime = r;
-  }
-  else {
-    lastTime->nextTime = r;
-    lastTime = r;
-  }
-
-  r->Time = newTime;
-
-  s1 = newSequence();
-  s1->indegree = 1;
-  s1->outdegree = 1;
-  s1->son = r;
-
-  s2 = newSequence();
-  s2->indegree = 1;
-  s2->outdegree = 1;
-  s2->son = r;
-
-  r->father = s1;
-  r->mother = s2;
-  
-  do {
-    P = getLegalPoint(r->intervals);
-    s1->intervals = intersectTo(r->intervals,P);
-    s2->intervals = intersectFrom(r->intervals,P);
-  
-    if (getYn(s1->intervals)==P) {
-      goodP = updateRecombination(P);
-    }
-    else
-      goodP = true;
-  } while (!goodP);
-
-  r->P = P;
-
-  s1->A = computeA(s1->intervals);
-  s2->A = computeA(s2->intervals);
-
-  putSequence(s1);
-  putSequence(s2);
-
-  printf("N %i|2|%f|",r->ID,r->Time);
-  printf("Time: %f",r->Time);
-  //printf("P: %f",r->P);
-  printf("\n");
-  
-  printf("IN %i|%f#",r->ID,r->P);
-  prettyInterval(r->intervals);
-  printf("\n");
-
-  if (r->son->indegree == 1) {
-    printf("E %i|%i|%i\n",edgeCounter,r->son->son->ID,r->ID);
-    printf("IE %i|",edgeCounter);
-    prettyInterval(r->son->intervals);
-    printf("\n");
-    edgeCounter++;
-  }
-  else
-    printf("E %i|%i|%i\n",edgeCounter++,r->son->ID,r->ID);
-}
-
-
-
-/*  static void addTopPoints(SEQUENCE *s) */
-/*  { */
-/*    addRootPoint(s->intervals,s); */
-/*  } */
-
 void build(void)
 {
   SEQUENCE *s;
@@ -357,9 +252,6 @@ void build(void)
     }
 
   }
-
-/*    traverseTopSeqs(addTopPoints); */
-
 }
 
 
@@ -367,8 +259,8 @@ INTERVAL *the_intervals;
 
 void intersectOne(SEQUENCE *s)
 {
-  intersect(s->intervals,the_intervals);  
-  s->A = computeA(s->intervals);  
+    intersect(s->intervals,the_intervals);
+    s->A = computeA(s->intervals);
 }
 
 void intersectAll(INTERVAL *i)

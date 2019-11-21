@@ -9,15 +9,9 @@ int num_ini_seq;      /* Number of initial sequences            */
 int R;                /* Recombination rate                     */
 int RZ;               /* Flag if R is zero                      */
 int alloc_size;       /* Size of a sequence pool (see graphics) */
-int mblock_size;      /* Size of a memory block (see graphics)  */
 int runs;
 int seed;
 double M1,M2;
-
-static int max(int a,int b)
-{
-  return a>b?a:b;
-}
 
 void parseArguments(int argc, char **argv)
 {
@@ -27,7 +21,6 @@ void parseArguments(int argc, char **argv)
   RZ = 1;
   num_ini_seq = 5;
   alloc_size = 10;
-  mblock_size = 30000;
   runs = 100;
   seed = time(NULL);
 
@@ -49,10 +42,6 @@ void parseArguments(int argc, char **argv)
 	alloc_size = atoi(c+7);
 	break;
       }
-      if (strncmp("mblock=",c,7)==0) {
-	mblock_size = atoi(c+7);
-	break;
-      }
       if (strncmp("m1=",c,3)==0) {
 	M1 = strtod(c+3,NULL);
 	break;
@@ -70,10 +59,6 @@ void parseArguments(int argc, char **argv)
       break;
     }
   }
-
-  mblock_size = max(mblock_size,(R/2+1)*sizeof(void *));
-  mblock_size = max(mblock_size,sizeof(int)*(num_ini_seq+1));
-  mblock_size = mblock_size + (1000-mblock_size%1000);
 
   srand(seed);
   srand48(seed);
