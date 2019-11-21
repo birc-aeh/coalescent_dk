@@ -10,7 +10,6 @@
 extern int num_ini_seq;
 static const int R = 1;
 
-static double root_z = 0.0;
 static int root_k;
 
 extern SEQUENCE *rootTime;
@@ -22,9 +21,9 @@ void initTerminator(void)
 
 void updateCoalescens(double from, double to)
 {
-  if ((root_z >= from) && (root_z < to)) {
-    root_k--;
-  }
+  assert(from <= to);
+  assert(from == 0.0);
+  root_k--;
 }
 
 bool is_last(void)
@@ -181,15 +180,15 @@ void dumpTreeStructure(REALTREE *t)
   dumpTreeStructure(t->right);
 }
 
-void dumpTree(double z, REALTREE *realtree)
+void dumpTree(REALTREE *realtree)
 {
-  printf("%f|",z);
+  printf("%f|",0.0);
   dumpTreeStructure(realtree);
   printf("\n");
 }
 
 void makeRealTree()
 {
-  double p = (root_z + (R/2.0))/2.0;
-  dumpTree(root_z, makeOneTree(p));
+  double p = (R/2.0)/2.0;
+  dumpTree(makeOneTree(p));
 }
