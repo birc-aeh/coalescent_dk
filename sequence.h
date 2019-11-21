@@ -13,7 +13,4 @@ void traverseTopSeqs(void (*opr)(SEQUENCE *));
 
 SEQUENCE *getSequenceWithType(int type);
 
-/* private */
-void handleSeq(SEQUENCE *s, void (*opr)(SEQUENCE *));
-
 #endif

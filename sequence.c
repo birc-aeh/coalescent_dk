@@ -13,7 +13,6 @@ typedef struct SeqArrayPointer {
 int size;                             /* External - next free slot */
 int type0;
 
-static bool flipflop;                 /* When traversing - the state of <visited> */
 static SeqArrayPointer *root,*last;   /* The root and active sequence array       */
 
 void initSequencePool(void)
@@ -21,8 +20,6 @@ void initSequencePool(void)
   size = 0;
   type0 = 0;
 
-  flipflop = false;
-  
   root = last = NEW(SeqArrayPointer);
   root->array = calloc(alloc_size, sizeof(SEQUENCE *));
   root->next = NULL;
@@ -37,7 +34,6 @@ SEQUENCE *newSequence(void)
   SEQUENCE *result;
   result = NEW(SEQUENCE);
   result->ID = ID++;
-  result->visited = flipflop;
   result->Time = 0.0;
   result->nextTime = NULL;
   result->reversed = false;
@@ -144,29 +140,3 @@ void traverseTopSeqs(void (*opr)(SEQUENCE *))
     sap = sap->next;
   }
 }
-
-/* Graph-traversal help function */
-void handleSeq(SEQUENCE *s, void (*opr)(SEQUENCE *))
-{
-  if (s==NULL) return;
-  if (s->visited==flipflop) return;
-  s->visited = flipflop;
-
-  switch (s->indegree) {
-  case 1:
-    handleSeq(s->son,opr);
-    break;
-  case 2:
-    handleSeq(s->son,opr);
-    handleSeq(s->daughter,opr);
-    break;
-  default:
-    break;
-  }
-
-  if (!(s->indegree==1 && s->outdegree==1))
-    (*opr)(s);
-}
-
-
-
