@@ -13,7 +13,6 @@ typedef struct termList {
   double z;
   int k;
   struct termList *next,*prev;
-  REALTREE *realtree;
 } termList;
 
 static termList *root;
@@ -361,10 +360,10 @@ void dumpTreeStructure(REALTREE *t)
   dumpTreeStructure(t->right);
 }
 
-void dumpTree(termList *t)
+void dumpTree(double z, REALTREE *realtree)
 {
-  printf("%f|",t->z);
-  dumpTreeStructure(t->realtree);
+  printf("%f|",z);
+  dumpTreeStructure(realtree);
   printf("\n");
 }
 
@@ -379,13 +378,11 @@ void makeRealTree()
   while (t->next!=NULL) {
     p = (t->z+t->next->z)/2.0;
 
-    t->realtree = makeOneTree(p);
-    dumpTree(t);
+    dumpTree(t->z, makeOneTree(p));
 
     t = t->next;
-  }   
-  
+  }
+
   p = (t->z+(R/2.0))/2.0;
-  t->realtree = makeOneTree(p);
-  dumpTree(t);
+  dumpTree(t->z, makeOneTree(p));
 }
