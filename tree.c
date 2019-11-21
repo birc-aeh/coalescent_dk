@@ -14,6 +14,7 @@ double newTime;          /* Elapsed time (backwards)               */
 
 SEQUENCE *rootTime;       /* Base of timeline */
 static SEQUENCE *lastTime; /* Timeline */
+static int coalescent_events_to_go;
 
 static int edgeCounter = 0;
 
@@ -50,15 +51,15 @@ double exponen(double f)
 
 void makeCoalescensNode(int type)
 {
-  SEQUENCE *s,*s1,*s2;
+  coalescent_events_to_go -= 1;
 
-  s1 = getSequenceWithType(type);
+  SEQUENCE *s1 = getSequenceWithType(type);
   s1->outdegree = 1;
 
-  s2 = getSequenceWithType(type);
+  SEQUENCE *s2 = getSequenceWithType(type);
   s2->outdegree = 1;
 
-  s = newSequence();
+  SEQUENCE *s = newSequence();
   s->indegree = 2;
   s->outdegree = 0;
 
@@ -73,7 +74,6 @@ void makeCoalescensNode(int type)
 
   s->son = s1;
   s->daughter = s2;
-  updateCoalescens();
   s->Time = newTime;
 
   s1->father = s;
@@ -92,7 +92,7 @@ void makeCoalescensNode(int type)
   printf("0.000000,0.500000#");
   printf("|");
 
-  if (is_last()) {
+  if (coalescent_events_to_go == 1) {
       printf("0.000000,0.500000#");
   }
 
@@ -119,7 +119,7 @@ void makeMigrationNode(int type)
 
   s->outdegree = 1;
   s->father = r;
-  
+
   r->Time = newTime;
 
   if (lastTime==NULL) {
@@ -153,7 +153,7 @@ void build(void)
 
   rootTime = lastTime = NULL;
   newTime = 0.0;
-  initTerminator();
+  coalescent_events_to_go = num_ini_seq;
 
   for (i=0; i<num_ini_seq; i++) {
     s = newSequence();
@@ -171,7 +171,7 @@ void build(void)
     printf("|\n");
   }
 
-  while (!is_last()) {
+  while (coalescent_events_to_go > 1) {
     assert(seqs_len > 1);
 
     int type0 = seqs_of_type0;

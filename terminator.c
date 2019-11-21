@@ -2,31 +2,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include "structures.h"
 #include "terminator.h"
 #include "memory.h"
 #include "tree.h"
 
 extern int num_ini_seq;
-static const int R = 1;
-
-static int root_k;
 
 extern SEQUENCE *rootTime;
-
-void initTerminator(void)
-{
-  root_k = num_ini_seq;
-}
-
-void updateCoalescens(void)
-{
-  root_k--;
-}
-
-bool is_last(void)
-{
-  return root_k == 1;
-}
 
 REALTREE *makeSub(void)
 {
@@ -184,8 +167,9 @@ void dumpTree(REALTREE *realtree)
   printf("\n");
 }
 
-void makeRealTree()
+void makeRealTree(void)
 {
+  const double R = 1.0;
   double p = (R/2.0)/2.0;
   dumpTree(makeOneTree(p));
 }
