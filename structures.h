@@ -24,7 +24,6 @@ typedef struct SEQUENCE {
   int outdegree;
 
   struct SEQUENCE *father;
-  struct SEQUENCE *mother;
   struct SEQUENCE *son;
   struct SEQUENCE *daughter;
 

@@ -64,8 +64,6 @@ static REALTREE *makeOneTree(double p)
     case 1:
       tmp->sub = NULL;
       tmp->father->sub = NULL;
-      if (tmp->outdegree > 1)
-        tmp->mother->sub = NULL;
       break;
     case 2:
       tmp->sub = NULL;
@@ -87,14 +85,8 @@ static REALTREE *makeOneTree(double p)
       else {
         tl->sub = tl->son->sub;
       }
-      if (tl->outdegree == 1) {
-        tl->father->sub = tl->sub;
-      } else {
-        if (p > 0.0) // TODO: always true?
-          tl->mother->sub = tl->sub;
-        else
-          tl->father->sub = tl->sub;
-      }
+      assert(tl->outdegree == 1);
+      tl->father->sub = tl->sub;
       break;
     case 2:
       /* Coalescens  */
