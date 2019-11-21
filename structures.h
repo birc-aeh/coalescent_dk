@@ -37,13 +37,8 @@ typedef struct SEQUENCE {
 
 typedef struct INTERVAL {
   int size;
-  struct INTERVALLIST *list;
+  double *ranges;
 } INTERVAL;
-
-typedef struct INTERVALLIST {
-  double start,end;
-  struct INTERVALLIST *prev,*next;
-} INTERVALLIST;
 
 typedef struct REALTREE {
   double time;

@@ -75,7 +75,7 @@ void makeCoalescensNode(int type)
 
   s->son = s1;
   s->daughter = s2;
-  s->intervals = unite(s1->intervals,s2->intervals);
+  s->intervals = unite(s1->intervals, s2->intervals, updateCoalescens);
   s->Time = newTime;
 
   s1->father = s;
