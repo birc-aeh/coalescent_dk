@@ -164,10 +164,9 @@ void makeMigrationNode(int type)
 
   printf("N %i|5|%f|",r->ID,r->Time);
   printf("Time: %f",r->Time);
-  //printf("P: %f",r->P);
   printf("\n");
-  
-  printf("IN %i|%f#",r->ID,r->P);
+
+  printf("IN %i|%f#", r->ID, 0.0);
   prettyInterval(r->intervals);
   printf("\n");
 

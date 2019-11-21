@@ -14,7 +14,6 @@ typedef struct SEQUENCE {
   int ID;
 
   double Time;
-  double P;
   double matleft;
 
   int type;

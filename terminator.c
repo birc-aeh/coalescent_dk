@@ -346,12 +346,12 @@ static REALTREE *makeOneTree(double p)
         tl->sub = tl->son->sub;
       }
       if (tl->outdegree == 1) {
-	tl->father->sub = tl->sub;
+        tl->father->sub = tl->sub;
       } else {
-	if (p > tl->P) 
-	  tl->mother->sub = tl->sub;
-	else
-	  tl->father->sub = tl->sub;
+        if (p > 0.0) // TODO: always true?
+          tl->mother->sub = tl->sub;
+        else
+          tl->father->sub = tl->sub;
       }
       break;
     case 2:
