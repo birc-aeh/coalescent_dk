@@ -17,7 +17,6 @@ typedef struct termList {
 
 static termList *root;
 static int *number_with_size;
-static int roof;
 static bool some_k_became_one;
 
 static double matleft;
@@ -32,9 +31,7 @@ void initTerminator(void)
   root->prev = NULL;
 
   number_with_size = calloc(sizeof(int), (num_ini_seq+1));
-  for (i=0; i<num_ini_seq; number_with_size[i++]=0);
   number_with_size[num_ini_seq] = 1;
-  roof = 1;
   some_k_became_one = false;
 }
 
@@ -146,7 +143,7 @@ double updateOneK(void)
 
 bool theEnd(void)
 {
-  return (number_with_size[1]==roof);
+  return (number_with_size[1] == 1);
 }
 
 
