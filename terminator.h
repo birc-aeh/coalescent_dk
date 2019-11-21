@@ -6,8 +6,7 @@
 
 void initTerminator(void);
 void updateCoalescens(double from, double to);
-double updateOneK(void);
-bool theEnd(void);
+bool is_last(void);
 
 
 void makeRealTree();

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <assert.h>
 #include "tree.h"
 #include "structures.h"
 #include "sequence.h"
@@ -79,7 +80,6 @@ void makeCoalescensNode(int type)
   s1->father = s;
   s2->father = s;
 
-  s->matleft = updateOneK();  
   s->type = type;
 
   putSequence(s);
@@ -93,32 +93,15 @@ void makeCoalescensNode(int type)
   prettyInterval(s->intervals);
   printf("|");
 
-  if (s->matleft>=0.0) {
+  if (is_last()) {
     i = uniteNoTerm(s1->intervals, s2->intervals);
     prettyInterval(i);
   }
 
   printf("\n");
 
-/*    if (s->son->indegree == 1) { */
-/*      printf("E %d|%d|%d\n",edgeCounter,s->son->son->ID,s->ID); */
-/*      printf("IE %d|",edgeCounter); */
-/*      prettyInterval(s->son->intervals); */
-/*      printf("\n"); */
-/*      edgeCounter++; */
-/*    } */
-/*    else */
-    printf("E %d|%d|%d\n",edgeCounter++,s->son->ID,s->ID);
-
-/*    if (s->daughter->indegree == 1) { */
-/*      printf("E %d|%d|%d\n",edgeCounter,s->daughter->son->ID,s->ID); */
-/*      printf("IE %d|",edgeCounter); */
-/*      prettyInterval(s->daughter->intervals); */
-/*      printf("\n"); */
-/*      edgeCounter++; */
-/*    } */
-/*    else */
-    printf("E %d|%d|%d\n",edgeCounter++,s->daughter->ID,s->ID);
+  printf("E %d|%d|%d\n",edgeCounter++,s->son->ID,s->ID);
+  printf("E %d|%d|%d\n",edgeCounter++,s->daughter->ID,s->ID);
 }
 
 
@@ -193,7 +176,7 @@ void build(void)
   }
 
   i = num_ini_seq;
-  while (!theEnd()) {
+  while (!is_last()) {
     if (seqs_len==1)
       printf("One size!!\n");
 

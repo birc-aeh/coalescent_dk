@@ -18,7 +18,6 @@ SEQUENCE *newSequence(void)
   result->ID = ID++;
   result->Time = 0.0;
   result->nextTime = NULL;
-  result->matleft = -1.0;
   result->type = 0;
   return result;
 }

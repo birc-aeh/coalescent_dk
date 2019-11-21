@@ -25,17 +25,9 @@ void updateCoalescens(double from, double to)
   }
 }
 
-double updateOneK(void)
+bool is_last(void)
 {
-  if (root_k == 1) {
-    return 0.0;
-  }
-  return -1.0;
-}
-
-bool theEnd(void)
-{
-  return (root_k == 1);
+  return root_k == 1;
 }
 
 
