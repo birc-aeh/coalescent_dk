@@ -446,35 +446,6 @@ static REALTREE *makeOneTree(double p)
 #define bl 9
 
 
-int printtree_r(char **display,int mdepth,REALTREE *t,int depth,
-		int *line) {
-  int i,j,from,to;
-  char num[5];
-  char rel[20];
-  if (t->left==NULL && t->right==NULL) {
-    /*tip*/
-    for(j=depth*bl;j<bl*mdepth+bl-1;j++)
-      display[*line][j] = '-';
-    sprintf(num, "%d", t->number);
-    strcat(display[*line], num);
-    return (*line)++;
-  }
-  else {
-    from = printtree_r(display,mdepth,t->left, depth+1,line);
-    (*line)++;
-    to = printtree_r(display,mdepth,t->right,depth+1,line);
-    for(i=from;i<=to;i++)
-      display[i][depth*bl+bl-1] = '|';
-    for(j=depth*bl;j<depth*bl+bl-1;j++)
-      display[(from+to)/2][j] = '-';
-    sprintf(rel,"%f",t->time);
-    for(i=0;rel[i]!='\0'&&i<10;i++)
-      display[(from+to)/2][j+1+i]=rel[i];
-    return (from+to)/2;
-  }
-}
-
-
 int depthtree(REALTREE *t) {
   int ld,rd;
   if (t==NULL)
