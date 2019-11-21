@@ -7,7 +7,7 @@
 #include "sets.h"
 
 extern int num_ini_seq;
-extern int R;
+static const int R = 1;
 
 typedef struct termList {
   double z;

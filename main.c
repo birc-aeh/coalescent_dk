@@ -10,7 +10,6 @@
 #include "arguments.h"
 
 extern int num_ini_seq;
-extern int R;
 extern int runs;
 extern int seed;
 
@@ -29,7 +28,7 @@ int main(int argc, char **argv)
   printf("L 1 Coalescent\n");
   printf("L 5 Migration\n");
 
-  printf("IR %f,%f#\n", 0.0, (double)R/2.0);
+  printf("IR %f,%f#\n", 0.0, 0.5);
   build();
 
   printf("\n");

@@ -50,18 +50,6 @@ INTERVAL *copyIntervals(INTERVAL *i)
   return new;
 }
 
-/* Return start-point of first part-interval in <i>. */
-double getX1(INTERVAL *i)
-{
-  return i->list->start;
-}
-
-/* Return end-point of last part-interval in <i>. */
-double getYn(INTERVAL *i)
-{
-  return i->list->prev->end;
-}
-
 /* Insert new element after <i>, returning */
 /* a reference to the new element.         */
 INTERVALLIST *appendInterval(INTERVALLIST *i)
@@ -332,7 +320,7 @@ void intersect(INTERVAL *dest, INTERVAL *i)
 
 }
 
-extern int R;
+static const int R = 1;
 
 INTERVAL *inverse(INTERVAL *i1)
 {

@@ -7,8 +7,6 @@
 #include "terminator.h"
 
 extern int num_ini_seq;   /* Number of initial sequences */
-extern int R;             /* Rekombination-rate */
-extern int RZ;
 
 extern int seqs_len;     /* Number of sequences to choose from (k) */
 extern double newTime;   /* Elapsed time (backwards)               */
@@ -44,13 +42,6 @@ int nextEvent(void)
 }
 
 
-double computeA(INTERVAL *i)
-{
-  if (i->size==0)
-    return 0.0;
-  return (getYn(i)-getX1(i));
-}
-
 double exponen(double f)
 {
   return -log(drand48())/f;
@@ -85,7 +76,6 @@ void makeCoalescensNode(int type)
   s->son = s1;
   s->daughter = s2;
   s->intervals = unite(s1->intervals,s2->intervals);
-  s->A = computeA(s->intervals);
   s->Time = newTime;
 
   s1->father = s;
@@ -198,10 +188,9 @@ void build(void)
 
   for (i=0; i<num_ini_seq; i++) {
     s = newSequence();
-    s->A = (double)R/2.0;
     s->indegree = 0;
     s->outdegree = 0;
-    s->intervals = initInterval(0,(double)R/2.0);
+    s->intervals = initInterval(0, 0.5);
     s->Time = 0.0;
     if (i>=num_ini_seq/2) s->type = 1;
 
@@ -226,13 +215,7 @@ void build(void)
     wmean += type0*M1;
     wmean += type1*M2;
 
-    if (RZ) 
-      newTime = newTime + exponen(wmean);
-    else {
-      fprintf(stderr,"Rho is not zero??\n");
-      exit(1);
-    }
-
+    newTime = newTime + exponen(wmean);
 
     switch (nextEvent()) {
     case 0:
@@ -260,7 +243,6 @@ INTERVAL *the_intervals;
 void intersectOne(SEQUENCE *s)
 {
     intersect(s->intervals,the_intervals);
-    s->A = computeA(s->intervals);
 }
 
 void intersectAll(INTERVAL *i)

@@ -13,7 +13,6 @@ typedef struct SEQUENCE {
   
   int ID;
 
-  double A;
   double Time;
   double P;
   double matleft;

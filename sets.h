@@ -13,9 +13,6 @@ void intersect(INTERVAL *dest, INTERVAL *i);
 
 INTERVAL *inverse(INTERVAL *i1);
 
-double getX1(INTERVAL *i);
-double getYn(INTERVAL *i);
-
 void prettyInterval(INTERVAL *i);
 
 
