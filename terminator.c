@@ -13,45 +13,29 @@ static const int R = 1;
 static double root_z = 0.0;
 static int root_k;
 
-static int *number_with_size;
-static bool some_k_became_one;
-
-static double matleft;
-
 void initTerminator(void)
 {
   root_k = num_ini_seq;
-
-  number_with_size = calloc(sizeof(int), (num_ini_seq+1));
-  number_with_size[num_ini_seq] = 1;
-  some_k_became_one = false;
 }
 
 void updateCoalescens(double from, double to)
 {
   if ((root_z >= from) && (root_z < to)) {
-    number_with_size[root_k]--;
     root_k--;
-    number_with_size[root_k]++;
-    if (root_k==1) {
-      some_k_became_one = true;
-    }
   }
 }
 
 double updateOneK(void)
 {
-  if (some_k_became_one) {
-    some_k_became_one = false;
-    return matleft;
+  if (root_k == 1) {
+    return 0.0;
   }
-  some_k_became_one = false;
   return -1.0;
 }
 
 bool theEnd(void)
 {
-  return (number_with_size[1] == 1);
+  return (root_k == 1);
 }
 
 
