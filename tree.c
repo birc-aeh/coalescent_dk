@@ -183,7 +183,6 @@ void build(void)
   rootTime = lastTime = NULL;
   newTime = 0.0;
   initTerminator();
-  initSequencePool();
 
   for (i=0; i<num_ini_seq; i++) {
     s = newSequence();

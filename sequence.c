@@ -8,13 +8,6 @@ int seqs_len = 0;      /* External - number of sequences in global list */
 static int seqs_alloc = 0;
 static SEQUENCE **seqs = NULL;
 
-void initSequencePool(void)
-{
-  seqs_len = 0;
-  seqs_alloc = 1000;
-  seqs = malloc(seqs_alloc*sizeof(SEQUENCE *));
-}
-
 /* Create a new sequence. */
 SEQUENCE *newSequence(void)
 {
@@ -35,7 +28,7 @@ SEQUENCE *newSequence(void)
 void putSequence(SEQUENCE *s)
 {
   if (seqs_len == seqs_alloc) {
-    seqs_alloc *= 2;
+    seqs_alloc = seqs_alloc == 0? 1000 : seqs_alloc*2;
     seqs = realloc(seqs, seqs_alloc*sizeof(SEQUENCE*));
   }
   seqs[seqs_len] = s;
