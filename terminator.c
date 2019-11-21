@@ -22,8 +22,6 @@ typedef struct jumpList {
 } jumpList;
 
 static termList *root;
-static termList **htable;
-static int hsize;
 static int *number_with_size;
 static int roof;
 static bool some_k_became_one;
@@ -46,12 +44,6 @@ void initTerminator(void)
   number_with_size[num_ini_seq] = 1;
   roof = 1;
   some_k_became_one = false;
-
-  hsize = (R/2)+1;
-  htable = calloc(hsize, sizeof(termList *));
-  for (i=0; i<hsize; i++) 
-    htable[i] = NULL;
-  htable[0] = root;
 
   jlist = NULL;
 }
@@ -234,31 +226,18 @@ INTERVAL *makeIntervals(void)
   return i;
 }
 
-debug double newTime;
-  
+double newTime;
+
 void updateCoalescens(double from, double to)
 {
-  termList *t;
-  int i;
-
-  if ((int)from>=hsize) {
-    fprintf(stderr,"Terminator problemems!!\n");
-    exit(1);
-  }
-
-  t = htable[(int)from];
-  if (t==NULL) {
-    for (i=((int)from)-1; htable[i]==NULL; i--);
-    t = htable[i];
-  }
-    
+  termList *t = root;
   while (t!=NULL) {
     if ((t->z >= from) && (t->z < to)) {
       number_with_size[t->k]--;
       t->k--;
       number_with_size[t->k]++;
       if (t->k==1) {
-	some_k_became_one = true;
+        some_k_became_one = true;
       }
     }
     if (t->z >= to) {
