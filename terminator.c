@@ -13,6 +13,8 @@ static const int R = 1;
 static double root_z = 0.0;
 static int root_k;
 
+extern SEQUENCE *rootTime;
+
 void initTerminator(void)
 {
   root_k = num_ini_seq;
@@ -30,10 +32,6 @@ bool is_last(void)
   return root_k == 1;
 }
 
-
-extern SEQUENCE *rootTime;
-
-
 REALTREE *makeSub(void)
 {
   REALTREE *result;
@@ -46,10 +44,6 @@ REALTREE *makeSub(void)
 
   return result;
 }
-
-
-
-
 
 static REALTREE *makeOneTree(double p)
 {
@@ -170,41 +164,8 @@ static REALTREE *makeOneTree(double p)
     if (n<=1) break;
     tl = tl->nextTime;
   }
-  
+
   return tl->sub;
-}
-
-
-
-
-#define bl 9
-
-
-int depthtree(REALTREE *t) {
-  int ld,rd;
-  if (t==NULL)
-    return 0;
-  else {
-    ld = depthtree(t->left);
-    rd = depthtree(t->right);
-    if (ld>rd)
-      return ld+1;
-    else 
-      return rd+1;
-  }
-}
-
-void printAlltree(REALTREE *t) {
-  if (t!=NULL) {
-    printf("(");
-    printAlltree(t->left);
-    printf(",");
-    printAlltree(t->right);
-    printf(")");
-    printf(":[%f:%i]",t->time,t->number);
-  }
-  else
-    printf("NULL");
 }
 
 void dumpTreeStructure(REALTREE *t)
