@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 #include "terminator.h"
 #include "memory.h"
 #include "tree.h"
@@ -9,13 +10,9 @@
 extern int num_ini_seq;
 static const int R = 1;
 
-typedef struct termList {
-  double z;
-  int k;
-  struct termList *next,*prev;
-} termList;
+static double root_z = 0.0;
+static int root_k;
 
-static termList *root;
 static int *number_with_size;
 static bool some_k_became_one;
 
@@ -23,108 +20,36 @@ static double matleft;
 
 void initTerminator(void)
 {
-  int i;
-  root = NEW(termList);
-  root->z = 0.0;
-  root->k = num_ini_seq;
-  root->next = NULL;
-  root->prev = NULL;
+  root_k = num_ini_seq;
 
   number_with_size = calloc(sizeof(int), (num_ini_seq+1));
   number_with_size[num_ini_seq] = 1;
   some_k_became_one = false;
 }
 
-static termList *last_k_one_in_this_run(termList *t)
-{
-  while (t != NULL && t->next != NULL && t->next->k == 1)
-    t = t->next;
-  return t;
-}
-
-static termList *find_first_k_one_after(termList *t)
-{
-  t = t->next;
-  while (t != NULL && t->k != 1)
-    t = t->next;
-  return t;
-}
-
 INTERVAL *makeIntervals(void)
 {
-  termList *t = root;
   int size = 0;
-  if (root != NULL && root->k > 1) {
-    t = find_first_k_one_after(t);
+  if (root_k > 1) {
     size++;
-  }
-
-  while (t != NULL) {
-    termList *to = last_k_one_in_this_run(t);
-    termList *next = find_first_k_one_after(to);
-    size++;
-    if (next == NULL && to->next == NULL)
-      size--;
-    t = next;
   }
 
   if (size == 0)
     return NULL;
 
-  double *il = calloc(size, 2*sizeof(double));
-  int j = 0;
-  t = root;
-  if (root != NULL && root->k > 1) {
-    t = find_first_k_one_after(t);
-    il[0] = root->z;
-    il[1] = t->z;
-    j++;
-  }
-  while (t != NULL) {
-    termList *to = last_k_one_in_this_run(t);
-    termList *next = find_first_k_one_after(to);
-    if (to->next != NULL) {
-      il[2*j] = to->next->z;
-      if (next != NULL)
-        il[2*j+1] = next->z;
-      else
-        il[2*j+1] = R / 2.0;
-    }
-    j++;
-    t = next;
-  }
-  INTERVAL *i = NEW(INTERVAL);
-  i->size = size;
-  i->ranges = il;
-
-  double sum = 0.0;
-  for (j = 0; j < i->size; j++) {
-    sum += i->ranges[2*j + 1] - i->ranges[2*j];
-  }
-
-  matleft = 200.0*sum/(float)R;
-
-  return i;
+  assert(0);
 }
 
 void updateCoalescens(double from, double to)
 {
-  termList *t = root;
-  while (t!=NULL) {
-    if ((t->z >= from) && (t->z < to)) {
-      number_with_size[t->k]--;
-      t->k--;
-      number_with_size[t->k]++;
-      if (t->k==1) {
-        some_k_became_one = true;
-      }
+  if ((root_z >= from) && (root_z < to)) {
+    number_with_size[root_k]--;
+    root_k--;
+    number_with_size[root_k]++;
+    if (root_k==1) {
+      some_k_became_one = true;
     }
-    if (t->z >= to) {
-      return;
-    }
-    t = t->next;
   }
-
 }
 
 INTERVAL *last_make;
@@ -353,20 +278,6 @@ void dumpTree(double z, REALTREE *realtree)
 
 void makeRealTree()
 {
-  termList *t;
-  double p;
-
-  t = root;
-
-  //printf("Here\n");
-  while (t->next!=NULL) {
-    p = (t->z+t->next->z)/2.0;
-
-    dumpTree(t->z, makeOneTree(p));
-
-    t = t->next;
-  }
-
-  p = (t->z+(R/2.0))/2.0;
-  dumpTree(t->z, makeOneTree(p));
+  double p = (root_z + (R/2.0))/2.0;
+  dumpTree(root_z, makeOneTree(p));
 }
