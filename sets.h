@@ -10,10 +10,6 @@ typedef void coal_callback(double, double);
 INTERVAL *unite(INTERVAL *i1, INTERVAL *i2, coal_callback);
 INTERVAL *uniteNoTerm(INTERVAL *i1, INTERVAL *i2);
 
-void intersect(INTERVAL *dest, INTERVAL *i);
-
-INTERVAL *inverse(INTERVAL *i1);
-
 void prettyInterval(INTERVAL *i);
 
 #endif

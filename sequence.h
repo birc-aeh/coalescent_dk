@@ -8,8 +8,6 @@ void putSequence(SEQUENCE *s);
 
 SEQUENCE *getSequence(int i);
 
-void traverseTopSeqs(void (*opr)(SEQUENCE *));
-
 SEQUENCE *getSequenceWithType(int type);
 
 #endif

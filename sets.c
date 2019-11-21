@@ -86,41 +86,6 @@ INTERVAL *uniteNoTerm(INTERVAL *i1, INTERVAL *i2)
     return merge_intervals(i1, i2, 0);
 }
 
-/* Intersect intervals <dest> with <i>. */
-void intersect(INTERVAL *dest, INTERVAL *i)
-{
-  INTERVAL *res = merge_intervals(dest, i, 1);
-  dest->ranges = res->ranges;
-  dest->size = res->size;
-}
-
-INTERVAL *inverse(INTERVAL *i1)
-{
-  if (i1->size == 0)
-    return initInterval(0.0, R/2.0);
-
-  int len = i1->size;
-  int first_is_bot = i1->ranges[0] <= 0.0;
-  int last_is_top = i1->ranges[i1->size*2 - 1] >= R/2.0;
-  int dst_off = first_is_bot? 0 : 1;
-  int src_off = first_is_bot? 1 : 0;
-  int to_copy = len*2;
-  if (first_is_bot)
-    to_copy -= 1;
-  if (last_is_top)
-    to_copy -= 1;
-
-  INTERVAL *res = malloc(sizeof(INTERVAL));
-  res->size = len + 1 - first_is_bot - last_is_top;
-  res->ranges = malloc(res->size*2*sizeof(double));
-
-  res->ranges[0] = 0.0;
-  memcpy(res->ranges+dst_off, i1->ranges+src_off, to_copy*sizeof(double));
-  if (!last_is_top)
-    res->ranges[2*res->size - 1] = R/2.0;
-  return res;
-}
-
 void prettyInterval(INTERVAL *i)
 {
   if (i==NULL) {

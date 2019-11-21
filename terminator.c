@@ -39,13 +39,9 @@ void updateCoalescens(double from, double to)
   }
 }
 
-INTERVAL *last_make;
-
 double updateOneK(void)
 {
   if (some_k_became_one) {
-    last_make = NULL;
-    intersectAll(last_make);
     some_k_became_one = false;
     return matleft;
   }

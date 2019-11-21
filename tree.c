@@ -47,8 +47,6 @@ double exponen(double f)
   return -log(drand48())/f;
 }
 
-extern INTERVAL *last_make;
-
 void makeCoalescensNode(int type)
 {
   SEQUENCE *s,*s1,*s2;
@@ -96,15 +94,8 @@ void makeCoalescensNode(int type)
   printf("|");
 
   if (s->matleft>=0.0) {
-
-    if (last_make!=NULL) {
-      i = inverse(last_make);
-      intersect(i,uniteNoTerm(s1->intervals,s2->intervals));
-      prettyInterval(i);
-    } else {
-      i = uniteNoTerm(s1->intervals,s2->intervals);
-      prettyInterval(i);
-    }
+    i = uniteNoTerm(s1->intervals, s2->intervals);
+    prettyInterval(i);
   }
 
   printf("\n");
@@ -235,17 +226,3 @@ void build(void)
   }
 }
 
-
-INTERVAL *the_intervals;
-
-void intersectOne(SEQUENCE *s)
-{
-    intersect(s->intervals,the_intervals);
-}
-
-void intersectAll(INTERVAL *i)
-{
-  if (i==NULL) return;
-  the_intervals = i;
-  traverseTopSeqs(intersectOne);
-}
