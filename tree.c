@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <math.h>
 #include "tree.h"
-#include "memory.h"
 #include "structures.h"
 #include "sequence.h"
 #include "terminator.h"
@@ -11,7 +10,7 @@ extern int num_ini_seq;   /* Number of initial sequences */
 extern int R;             /* Rekombination-rate */
 extern int RZ;
 
-extern int size;         /* Number of sequences to choose from (k) */
+extern int seqs_len;     /* Number of sequences to choose from (k) */
 extern double newTime;   /* Elapsed time (backwards)               */
 
 SEQUENCE *rootTime;       /* Base of timeline */
@@ -27,7 +26,7 @@ int nextEvent(void)
   double pc1,pc2,pm1,pm2,p;
   int type1;
 
-  type1 = (size-type0);
+  type1 = (seqs_len-type0);
   pc1 = (type0*(type0-1))/2;
   pc2 = (type1*(type1-1))/2;
 
@@ -216,10 +215,10 @@ void build(void)
 
   i = num_ini_seq;
   while (!theEnd()) {
-    if (size==1)
+    if (seqs_len==1)
       printf("One size!!\n");
 
-    type1 = (size-type0);
+    type1 = (seqs_len-type0);
     wmean =  (type0*(type0-1))/2;
     wmean += (type1*(type1-1))/2;
     wmean += type0*M1;
@@ -268,7 +267,3 @@ void intersectAll(INTERVAL *i)
   the_intervals = i;
   traverseTopSeqs(intersectOne);
 }
-
-
-
-

@@ -8,7 +8,6 @@
 int num_ini_seq;      /* Number of initial sequences            */
 int R;                /* Recombination rate                     */
 int RZ;               /* Flag if R is zero                      */
-int alloc_size;       /* Size of a sequence pool (see graphics) */
 int runs;
 int seed;
 double M1,M2;
@@ -20,7 +19,6 @@ void parseArguments(int argc, char **argv)
   R = 1;
   RZ = 1;
   num_ini_seq = 5;
-  alloc_size = 10;
   runs = 100;
   seed = time(NULL);
 
@@ -36,10 +34,6 @@ void parseArguments(int argc, char **argv)
       }
       if (strncmp("seed=",c,5)==0) {
 	seed = atoi(c+5);
-	break;
-      }
-      if (strncmp("sblock=",c,7)==0) {
-	alloc_size = atoi(c+7);
 	break;
       }
       if (strncmp("m1=",c,3)==0) {

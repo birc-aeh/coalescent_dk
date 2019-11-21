@@ -3,27 +3,19 @@
 #include "sequence.h"
 #include "memory.h"
 
-extern int alloc_size;
-
-typedef struct SeqArrayPointer {
-  SEQUENCE **array;
-  struct SeqArrayPointer *next,*prev;
-} SeqArrayPointer;
-
-int size;                             /* External - next free slot */
 int type0;
 
-static SeqArrayPointer *root,*last;   /* The root and active sequence array       */
+int seqs_len = 0; /* External - number of sequences in global list */
+static int seqs_alloc = 0;
+static SEQUENCE **seqs = NULL;
 
 void initSequencePool(void)
 {
-  size = 0;
   type0 = 0;
 
-  root = last = NEW(SeqArrayPointer);
-  root->array = calloc(alloc_size, sizeof(SEQUENCE *));
-  root->next = NULL;
-  root->prev = root;
+  seqs_len = 0;
+  seqs_alloc = 1000;
+  seqs = malloc(seqs_alloc*sizeof(SEQUENCE *));
 }
 
 /* Create a new sequence. */
@@ -48,76 +40,49 @@ SEQUENCE *newSequence(void)
 /* it if necessary.                             */
 void putSequence(SEQUENCE *s)
 {
-  int i;
-
-  if (size%alloc_size==0 && size>0) {
-    if (last->next==NULL) {
-      last->next = NEW(SeqArrayPointer);
-      last->next->array = calloc(alloc_size, sizeof(SEQUENCE *));
-      for (i=0; i<alloc_size; i++)
-	last->next->array[i] = NULL;
-      last->next->next = NULL;
-      last->next->prev = last;
-    }
-    last = last->next;
+  if (seqs_len == seqs_alloc) {
+    seqs_alloc *= 2;
+    seqs = realloc(seqs, seqs_alloc*sizeof(SEQUENCE*));
   }
-  
-  last->array[size%alloc_size] = s;
+  seqs[seqs_len] = s;
+  seqs_len += 1;
 
-  if (s->type == 0) type0++;
-  size++;
+  if (s->type == 0)
+    type0++;
 }
 
-/* Get sequence at index i - move the last sequence */ 
+/* Get sequence at index i - move the last sequence */
 /* in the structure to the freed slot.              */
 SEQUENCE *getSequence(int i)
 {
-  SEQUENCE *result;
-  SeqArrayPointer *table;
-  int j;
-
-  if (i>=size) {
+  if (i >= seqs_len) {
     fprintf(stderr,"Index out of range: getSequence(%i)\n",i);
     exit(1);
   }
 
-  table = root;
-  for(j=0; j<(i/alloc_size); j++)
-    table = table->next;
-
-  result = table->array[i%alloc_size];
-  size--;
-
-  table->array[i%alloc_size] = last->array[size%alloc_size];
-  last->array[size%alloc_size] = NULL;
-
-  if (size%alloc_size == 0) {
-    last = last->prev;
-  }
+  SEQUENCE *result = seqs[i];
+  seqs[i] = seqs[seqs_len-1];
+  seqs_len -= 1;
 
   if (result->type == 0) type0--;
   return result;
-}  
+}
 
 SEQUENCE *getSequenceWithType(int type)
 {
-  int num,i,j;
-  SeqArrayPointer *sap;
+  int num,i;
 
   if (type == 0)
     num = (int)(drand48()*type0);
   else
-    num = (int)(drand48()*(size-type0));
+    num = (int)(drand48()*(seqs_len-type0));
 
-  sap = root;
-  for (i=0; i<size; i+=alloc_size) {
-      for (j=0; j<alloc_size; j++) {
-	if (sap->array[j]->type == type) {
-	  if (num == 0) return getSequence(i+j);
-	  num--;
-	}
-      }
-      sap = sap->next;
+  for (i = 0; i < seqs_len; i++) {
+    if (seqs[i]->type == type) {
+      if (num == 0)
+        return getSequence(i);
+      num -= 1;
+    }
   }
 
   return NULL;
@@ -127,16 +92,7 @@ SEQUENCE *getSequenceWithType(int type)
 /* calling function <opr> with each sequence.      */
 void traverseTopSeqs(void (*opr)(SEQUENCE *))
 {
-  SeqArrayPointer *sap;
-  int j;
-  
-  sap = root;
-  while (sap!=NULL) {
-    for (j=0; j<alloc_size; j++) {
-      if (sap->array[j]==NULL) 
-	return;
-      opr(sap->array[j]);
-    }
-    sap = sap->next;
-  }
+  int i;
+  for (i = 0; i < seqs_len; i++)
+    opr(seqs[i]);
 }
