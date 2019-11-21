@@ -31,8 +31,6 @@ typedef struct SEQUENCE {
   struct SEQUENCE *daughter;
 
   struct SEQUENCE *nextTime;
-  int x,y;
-  bool reversed;
 
   struct INTERVAL *intervals;
 } SEQUENCE;
