@@ -124,8 +124,6 @@ INTERVAL *makeIntervals(void)
   return i;
 }
 
-double newTime;
-
 void updateCoalescens(double from, double to)
 {
   termList *t = root;
