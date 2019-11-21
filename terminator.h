@@ -5,7 +5,7 @@
 #include "structures.h"
 
 void initTerminator(void);
-void updateCoalescens(double from, double to);
+void updateCoalescens(void);
 bool is_last(void);
 
 

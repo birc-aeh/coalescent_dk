@@ -28,8 +28,6 @@ typedef struct SEQUENCE {
   struct SEQUENCE *daughter;
 
   struct SEQUENCE *nextTime;
-
-  struct INTERVAL *intervals;
 } SEQUENCE;
 
 

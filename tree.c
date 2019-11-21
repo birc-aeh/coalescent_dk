@@ -51,14 +51,13 @@ double exponen(double f)
 void makeCoalescensNode(int type)
 {
   SEQUENCE *s,*s1,*s2;
-  INTERVAL *i;
 
   s1 = getSequenceWithType(type);
   s1->outdegree = 1;
 
   s2 = getSequenceWithType(type);
   s2->outdegree = 1;
-  
+
   s = newSequence();
   s->indegree = 2;
   s->outdegree = 0;
@@ -74,7 +73,7 @@ void makeCoalescensNode(int type)
 
   s->son = s1;
   s->daughter = s2;
-  s->intervals = unite(s1->intervals, s2->intervals, updateCoalescens);
+  updateCoalescens();
   s->Time = newTime;
 
   s1->father = s;
@@ -90,12 +89,11 @@ void makeCoalescensNode(int type)
   printf("\n");
 
   printf("IN %i|",s->ID);
-  prettyInterval(s->intervals);
+  printf("0.000000,0.500000#");
   printf("|");
 
   if (is_last()) {
-    i = uniteNoTerm(s1->intervals, s2->intervals);
-    prettyInterval(i);
+      printf("0.000000,0.500000#");
   }
 
   printf("\n");
@@ -118,7 +116,6 @@ void makeMigrationNode(int type)
   r->outdegree = 1;
   r->son = s;
   r->type = (s->type+1)%2;
-  r->intervals = copyIntervals(s->intervals);
 
   s->outdegree = 1;
   s->father = r;
@@ -141,7 +138,7 @@ void makeMigrationNode(int type)
   printf("\n");
 
   printf("IN %i|%f#", r->ID, 0.0);
-  prettyInterval(r->intervals);
+  printf("0.000000,0.500000#");
   printf("\n");
 
   printf("E %i|%i|%i\n",edgeCounter++,r->son->ID,r->ID);
@@ -162,7 +159,6 @@ void build(void)
     s = newSequence();
     s->indegree = 0;
     s->outdegree = 0;
-    s->intervals = initInterval(0, 0.5);
     s->Time = 0.0;
     if (i>=num_ini_seq/2) s->type = 1;
 
@@ -171,7 +167,7 @@ void build(void)
     printf("N %i|%i|%f|",s->ID,s->type?3:0,s->Time);
     printf("Time:%f\n",s->Time);
     printf("IN %d|",s->ID);
-    prettyInterval(s->intervals);
+    printf("0.000000,0.500000#");
     printf("|\n");
   }
 

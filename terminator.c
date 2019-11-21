@@ -5,7 +5,6 @@
 #include "terminator.h"
 #include "memory.h"
 #include "tree.h"
-#include "sets.h"
 
 extern int num_ini_seq;
 static const int R = 1;
@@ -19,10 +18,8 @@ void initTerminator(void)
   root_k = num_ini_seq;
 }
 
-void updateCoalescens(double from, double to)
+void updateCoalescens(void)
 {
-  assert(from <= to);
-  assert(from == 0.0);
   root_k--;
 }
 
