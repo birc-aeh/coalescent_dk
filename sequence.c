@@ -29,7 +29,7 @@ void initSequencePool(void)
   flipflop = false;
   
   root = last = NEW(SeqArrayPointer);
-  root->array = Malloc(alloc_size*sizeof(SEQUENCE *));
+  root->array = calloc(alloc_size, sizeof(SEQUENCE *));
   root->thisA = 0.0;
   root->next = NULL;
   root->prev = root;
@@ -65,7 +65,7 @@ void putSequence(SEQUENCE *s)
   if (size%alloc_size==0 && size>0) {
     if (last->next==NULL) {
       last->next = NEW(SeqArrayPointer);
-      last->next->array = Malloc(alloc_size*sizeof(SEQUENCE *));
+      last->next->array = calloc(alloc_size, sizeof(SEQUENCE *));
       for (i=0; i<alloc_size; i++)
 	last->next->array[i] = NULL;
       last->next->thisA = 0.0;

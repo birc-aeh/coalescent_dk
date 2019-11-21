@@ -21,7 +21,6 @@ int main(int argc, char **argv)
 
 
   parseArguments(argc,argv);
-  initMemory();
 
   printf("Migration\n");
 

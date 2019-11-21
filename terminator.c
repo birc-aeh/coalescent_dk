@@ -73,14 +73,14 @@ void initTerminator(void)
   root->next = NULL;
   root->prev = NULL;
 
-  number_with_size = Malloc(sizeof(int)*(num_ini_seq+1));
+  number_with_size = calloc(sizeof(int), (num_ini_seq+1));
   for (i=0; i<num_ini_seq; number_with_size[i++]=0);
   number_with_size[num_ini_seq] = 1;
   roof = 1;
   some_k_became_one = false;
 
   hsize = (R/2)+1;
-  htable = Malloc(hsize*sizeof(termList *));
+  htable = calloc(hsize, sizeof(termList *));
   for (i=0; i<hsize; i++) 
     htable[i] = NULL;
   htable[0] = root;
@@ -223,7 +223,7 @@ INTERVAL *makeIntervals(void)
 
   if (size==0) return NULL;
 
-  il = Malloc(sizeof(INTERVALLIST)*size);
+  il = calloc(sizeof(INTERVALLIST), size);
   jl=jlist;
   j=0;
   if (root!=jl->from) {
@@ -589,9 +589,9 @@ void printtree(REALTREE *t, FILE *treeFILE) {
   int mdepth = depthtree(t)-1;
   int n = num_ini_seq;
   int curline = 0,j;
-  char **display = (char **) allocate((n*2-1) * sizeof(char *));
+  char **display = (char **) calloc((n*2-1), sizeof(char *));
   for(j=0; j<2*n-1; j++) {
-    display[j] = (char *) allocate((bl*(mdepth+1) + 7) * sizeof(char));
+    display[j] = (char *) calloc((bl*(mdepth+1) + 7), sizeof(char));
     memset(display[j], ' ', bl*(1+mdepth) + 6);
     display[j][bl*(1+mdepth)] = '\0';
   }
