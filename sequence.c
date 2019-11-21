@@ -3,16 +3,13 @@
 #include "sequence.h"
 #include "memory.h"
 
-int type0;
-
-int seqs_len = 0; /* External - number of sequences in global list */
+int seqs_of_type0 = 0; /* External - count of type 0 elements in global list */
+int seqs_len = 0;      /* External - number of sequences in global list */
 static int seqs_alloc = 0;
 static SEQUENCE **seqs = NULL;
 
 void initSequencePool(void)
 {
-  type0 = 0;
-
   seqs_len = 0;
   seqs_alloc = 1000;
   seqs = malloc(seqs_alloc*sizeof(SEQUENCE *));
@@ -48,7 +45,7 @@ void putSequence(SEQUENCE *s)
   seqs_len += 1;
 
   if (s->type == 0)
-    type0++;
+    seqs_of_type0 += 1;
 }
 
 /* Get sequence at index i - move the last sequence */
@@ -64,7 +61,8 @@ SEQUENCE *getSequence(int i)
   seqs[i] = seqs[seqs_len-1];
   seqs_len -= 1;
 
-  if (result->type == 0) type0--;
+  if (result->type == 0)
+    seqs_of_type0 -= 1;
   return result;
 }
 
@@ -73,9 +71,9 @@ SEQUENCE *getSequenceWithType(int type)
   int num,i;
 
   if (type == 0)
-    num = (int)(drand48()*type0);
+    num = (int)(drand48()*seqs_of_type0);
   else
-    num = (int)(drand48()*(seqs_len-type0));
+    num = (int)(drand48()*(seqs_len-seqs_of_type0));
 
   for (i = 0; i < seqs_len; i++) {
     if (seqs[i]->type == type) {

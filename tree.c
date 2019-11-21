@@ -19,11 +19,12 @@ static SEQUENCE *lastTime; /* Timeline */
 static int edgeCounter = 0;
 
 extern double M1,M2;
-extern int type0;
+extern int seqs_of_type0;
 
 int nextEvent(void)
 {
   double pc1,pc2,pm1,pm2,p;
+  int type0 = seqs_of_type0;
   int type1;
 
   type1 = (seqs_len-type0);
@@ -39,7 +40,7 @@ int nextEvent(void)
   if (p < pc2) return 1;
   p -= pc2;
   if (p < pm1) return 2;
-  return 3;  
+  return 3;
 }
 
 
@@ -218,6 +219,7 @@ void build(void)
     if (seqs_len==1)
       printf("One size!!\n");
 
+    int type0 = seqs_of_type0;
     type1 = (seqs_len-type0);
     wmean =  (type0*(type0-1))/2;
     wmean += (type1*(type1-1))/2;
