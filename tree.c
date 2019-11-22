@@ -19,15 +19,14 @@ static int coalescent_events_to_go;
 static int edgeCounter = 0;
 
 extern double M1,M2;
-extern int seqs_of_type0;
+extern int type_counts[2];
 
 int nextEvent(void)
 {
   double pc1,pc2,pm1,pm2,p;
-  int type0 = seqs_of_type0;
-  int type1;
+  int type0 = type_counts[0];
+  int type1 = type_counts[1];
 
-  type1 = (seqs_len-type0);
   pc1 = (type0*(type0-1))/2;
   pc2 = (type1*(type1-1))/2;
 
@@ -42,7 +41,6 @@ int nextEvent(void)
   if (p < pm1) return 2;
   return 3;
 }
-
 
 double exponen(double f)
 {
@@ -144,11 +142,10 @@ void makeMigrationNode(int type)
   printf("E %i|%i|%i\n",edgeCounter++,r->son->ID,r->ID);
 }
 
-
 void build(void)
 {
   SEQUENCE *s;
-  int i,type1;
+  int i;
   double wmean;
 
   rootTime = lastTime = NULL;
@@ -174,8 +171,8 @@ void build(void)
   while (coalescent_events_to_go > 1) {
     assert(seqs_len > 1);
 
-    int type0 = seqs_of_type0;
-    type1 = (seqs_len-type0);
+    int type0 = type_counts[0];
+    int type1 = type_counts[1];
     wmean =  (type0*(type0-1))/2;
     wmean += (type1*(type1-1))/2;
     wmean += type0*M1;
@@ -201,4 +198,3 @@ void build(void)
     }
   }
 }
-
