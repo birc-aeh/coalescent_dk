@@ -11,7 +11,7 @@ extern int num_ini_seq;
 
 extern SEQUENCE *rootTime;
 
-REALTREE *makeSub(void)
+static REALTREE *makeSub(void)
 {
   REALTREE *result;
 
@@ -147,7 +147,7 @@ static REALTREE *makeOneTree(double p)
   return tl->sub;
 }
 
-void dumpTreeStructure(REALTREE *t)
+static void dumpTreeStructure(REALTREE *t)
 {
   if (!t) return;
 
@@ -160,7 +160,7 @@ void dumpTreeStructure(REALTREE *t)
   dumpTreeStructure(t->right);
 }
 
-void dumpTree(REALTREE *realtree)
+static void dumpTree(REALTREE *realtree)
 {
   printf("%f|",0.0);
   dumpTreeStructure(realtree);

@@ -10,7 +10,7 @@
 extern int num_ini_seq;   /* Number of initial sequences */
 
 extern int seqs_len;     /* Number of sequences to choose from (k) */
-double newTime;          /* Elapsed time (backwards)               */
+static double newTime;   /* Elapsed time (backwards)               */
 
 SEQUENCE *rootTime;       /* Base of timeline */
 static SEQUENCE *lastTime; /* Timeline */
