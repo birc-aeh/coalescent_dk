@@ -5,7 +5,6 @@
 #include "tree.h"
 #include "structures.h"
 #include "sequence.h"
-#include "terminator.h"
 
 extern int num_ini_seq;   /* Number of initial sequences */
 

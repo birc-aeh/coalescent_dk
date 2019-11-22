@@ -5,7 +5,6 @@
 #include "structures.h"
 #include "terminator.h"
 #include "memory.h"
-#include "tree.h"
 
 extern int num_ini_seq;
 
