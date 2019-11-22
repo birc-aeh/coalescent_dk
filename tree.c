@@ -6,38 +6,36 @@
 #include "structures.h"
 #include "sequence.h"
 
-extern int num_ini_seq;   /* Number of initial sequences */
-
+extern int num_ini_seq;  /* Number of initial sequences */
 extern int seqs_len;     /* Number of sequences to choose from (k) */
-static double newTime;   /* Elapsed time (backwards)               */
+extern double M1, M2;
+extern int type_counts[2];
 
-SEQUENCE *rootTime;       /* Base of timeline */
+static double newTime;   /* Elapsed time (backwards) */
 static SEQUENCE *lastTime; /* Timeline */
 static int coalescent_events_to_go;
-
 static int edgeCounter = 0;
 
-extern double M1,M2;
-extern int type_counts[2];
+SEQUENCE *rootTime;       /* Base of timeline */
 
 int nextEvent(void)
 {
-  double pc1,pc2,pm1,pm2,p;
   int type0 = type_counts[0];
   int type1 = type_counts[1];
 
-  pc1 = (type0*(type0-1))/2;
-  pc2 = (type1*(type1-1))/2;
+  double pc1 = (type0*(type0-1))/2;
+  double pc2 = (type1*(type1-1))/2;
 
-  pm1 = type0*M1;
-  pm2 = type1*M2;
+  double pm1 = type0*M1;
+  double pm2 = type1*M2;
 
-  p = drand48()*(pc1+pc2+pm1+pm2);
-  if (p < pc1) return 0;
-  p -= pc1;
-  if (p < pc2) return 1;
-  p -= pc2;
-  if (p < pm1) return 2;
+  double p = drand48()*(pc1+pc2+pm1+pm2);
+  if (p < pc1)
+      return 0;
+  if (p - pc1 < pc2)
+      return 1;
+  if (p - pc1 - pc2 < pm1)
+      return 2;
   return 3;
 }
 
@@ -51,16 +49,19 @@ void makeCoalescensNode(int type)
   coalescent_events_to_go -= 1;
 
   SEQUENCE *s1 = getSequenceWithType(type);
-  s1->outdegree = 1;
-
   SEQUENCE *s2 = getSequenceWithType(type);
+  SEQUENCE *s = newSequence(type);
+  s->indegree = 2,
+  s->son = s1,
+  s->daughter = s2,
+  s->Time = newTime,
+
+  s1->outdegree = 1;
   s2->outdegree = 1;
+  s1->father = s;
+  s2->father = s;
 
-  SEQUENCE *s = newSequence();
-  s->indegree = 2;
-  s->outdegree = 0;
-
-  if (lastTime==NULL) {
+  if (lastTime == NULL) {
     lastTime = s;
     rootTime = s;
   }
@@ -69,18 +70,8 @@ void makeCoalescensNode(int type)
     lastTime = s;
   }
 
-  s->son = s1;
-  s->daughter = s2;
-  s->Time = newTime;
-
-  s1->father = s;
-  s2->father = s;
-
-  s->type = type;
-
   putSequence(s);
 
-  //printf("N %i|%i|%f|",s->ID,s->type+2,s->Time);
   printf("N %i|%i|%f|",s->ID,1,s->Time);
   printf("Time:%f",s->Time);
   printf("\n");
@@ -103,23 +94,17 @@ void makeCoalescensNode(int type)
 void makeMigrationNode(int type)
 {
 
-  SEQUENCE *s, *r;
-
-  s = getSequenceWithType(type);
-  if (s->type != type) { fprintf(stderr,"Bad impl\n"); exit(1); }
-
-  r = newSequence();
-  r->indegree = 1;
-  r->outdegree = 1;
-  r->son = s;
-  r->type = (s->type+1)%2;
+  SEQUENCE *s = getSequenceWithType(type);
+  SEQUENCE *r = newSequence((s->type + 1) % 2);
+  r->indegree = 1,
+  r->outdegree = 1,
+  r->son = s,
+  r->Time = newTime,
 
   s->outdegree = 1;
   s->father = r;
 
-  r->Time = newTime;
-
-  if (lastTime==NULL) {
+  if (lastTime == NULL) {
     lastTime = r;
     rootTime = r;
   }
@@ -143,7 +128,6 @@ void makeMigrationNode(int type)
 
 void build(void)
 {
-  SEQUENCE *s;
   int i;
   double wmean;
 
@@ -151,13 +135,8 @@ void build(void)
   newTime = 0.0;
   coalescent_events_to_go = num_ini_seq;
 
-  for (i=0; i<num_ini_seq; i++) {
-    s = newSequence();
-    s->indegree = 0;
-    s->outdegree = 0;
-    s->Time = 0.0;
-    if (i>=num_ini_seq/2) s->type = 1;
-
+  for (i = 0; i < num_ini_seq; i++) {
+    SEQUENCE *s = newSequence(i >= num_ini_seq/2);
     putSequence(s);
 
     printf("N %i|%i|%f|",s->ID,s->type?3:0,s->Time);

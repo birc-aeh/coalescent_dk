@@ -10,16 +10,13 @@ static int seqs_alloc = 0;
 static SEQUENCE **seqs = NULL;
 
 /* Create a new sequence. */
-SEQUENCE *newSequence(void)
+SEQUENCE *newSequence(int type)
 {
   static int ID = 0;
 
-  SEQUENCE *result;
-  result = NEW(SEQUENCE);
+  SEQUENCE *result = NEW(SEQUENCE);
   result->ID = ID++;
-  result->Time = 0.0;
-  result->nextTime = NULL;
-  result->type = 0;
+  result->type = type;
   return result;
 }
 

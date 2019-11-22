@@ -3,7 +3,7 @@
 
 #include "structures.h"
 
-SEQUENCE *newSequence(void);
+SEQUENCE *newSequence(int type);
 void putSequence(SEQUENCE *s);
 
 SEQUENCE *getSequenceWithType(int type);
