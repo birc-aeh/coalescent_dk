@@ -9,3 +9,4 @@ default:
 	$(CC) $(CFLAGS) server-side-selection/*.c -o bin/selection
 	$(CC) $(CFLAGS) server-side-hudson/*.c -o bin/hudson
 	$(CC) $(CFLAGS) dumb-init/dumb-init.c -o bin/dumb-init
+	strip bin/*
