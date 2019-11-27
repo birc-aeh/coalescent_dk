@@ -25,9 +25,9 @@ static REALTREE* coalesence_node(double time, REALTREE *left, REALTREE *right)
 
 static REALTREE *makeOneTree(void)
 {
+  REALTREE *res = NULL;
   SEQUENCE *tl = rootTime;
-
-  for (;;) {
+  for (; tl != NULL; tl = tl->nextTime) {
     bool son_is_leaf      = (tl->indegree >= 1) && (tl->son->indegree == 0);
     bool daughter_is_leaf = (tl->indegree >= 2) && (tl->daughter->indegree == 0);
     if (tl->indegree == 1) {
@@ -44,11 +44,9 @@ static REALTREE *makeOneTree(void)
       REALTREE *right = daughter_is_leaf? leaf_node(tl->daughter->ID)   : tl->daughter->sub;
       tl->sub = coalesence_node(tl->Time, left, right);
     }
-
-    if (tl->nextTime == NULL) break;
-    tl = tl->nextTime;
+    res = tl->sub;
   }
-  return tl->sub;
+  return res;
 }
 
 static void dumpTreeStructure(REALTREE *t)

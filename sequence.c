@@ -5,7 +5,7 @@
 #include "memory.h"
 
 int type_counts[2] = {0}; /* External - count of elements in global list with each type */
-int seqs_len = 0;      /* External - number of sequences in global list */
+int seqs_len = 0;         /* External - number of sequences in global list */
 static int seqs_alloc = 0;
 static SEQUENCE **seqs = NULL;
 
