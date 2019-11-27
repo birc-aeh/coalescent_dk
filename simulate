@@ -1,0 +1,31 @@
+#!/bin/sh
+args=""
+command=""
+
+# split the param string on &
+for arg in `echo $QUERY_STRING | tr '&' '\n'`; do
+    if [ -z $command ]; then
+        command="$arg";
+    else
+	# http -d decodes the URL encoding
+        args="$args `httpd -d $arg`"
+    fi
+done
+
+if [ -z $command ]; then
+    echo "no command"
+    exit 1
+fi
+
+echo "Content-type: text/plain";
+echo ""
+
+case $command in
+    command=hudson)    exec ./hudson $args;;
+    command=migrate)   exec ./migration $args;;
+    command=exprate)   exec ./exprate $args;;
+    command=selection) exec ./selection $args;;
+    *)
+        echo "unknown command \"$command\""
+        exit 1 ;;
+esac
