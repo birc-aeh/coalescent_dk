@@ -199,18 +199,20 @@ bool theEnd(void)
 
 extern SEQUENCE *rootTime;
 
-
-REALTREE *makeSub(void)
+static REALTREE* leaf_node(int id)
 {
-  REALTREE *result;
+  REALTREE *res = calloc(1, sizeof(REALTREE));
+  res->number = id;
+  return res;
+}
 
-  result = malloc(sizeof(REALTREE));
-  result->left = 0;
-  result->right = 0;
-  result->time = 0.0;
-  result->number = 0;
-
-  return result;
+static REALTREE* coalesence_node(double time, REALTREE *left, REALTREE *right)
+{
+  REALTREE *res = calloc(1, sizeof(REALTREE));
+  res->time = time;
+  res->left = left;
+  res->right = right;
+  return res;
 }
 
 static REALTREE *makeOneTree(double p)
@@ -238,49 +240,30 @@ static REALTREE *makeOneTree(double p)
   tl = rootTime;
 
   while (n > 1) {
-    tmp = NULL;
     switch (tl->indegree) {
     case 1:
       /* Recombination */
-      if (tl->son->indegree == 0) {
-        tl->sub = makeSub();
-        tl->sub->number = tl->son->ID;
-      }
-      else {
-        tl->sub = tl->son->sub;
-      }
-      if (p > tl->P) 
-        tl->mother->sub = tl->sub;
-      else
-        tl->father->sub = tl->sub;
+      tl->sub = (tl->son->indegree == 0)? leaf_node(tl->son->ID) : tl->son->sub;
+      SEQUENCE *parent = (p > tl->P)? tl->mother : tl->father;
+      parent->sub = tl->sub;
       break;
     case 2:
       /* Coalescens  */
       if (tl->son->indegree == 0) {
         /* Both children are leaves */
         if (tl->daughter->indegree == 0) {
-          tl->sub = makeSub();
-          tl->sub->time = tl->Time;
-          tl->sub->left = makeSub();
-          tl->sub->left->number = tl->son->ID;
-          tl->sub->right = makeSub();
-          tl->sub->right->number = tl->daughter->ID;
+          tl->sub = coalesence_node(tl->Time, leaf_node(tl->son->ID), leaf_node(tl->daughter->ID));
           n--;
           break;
         }
         /* Son is leaf, daughter is bad  */
         if (tl->daughter->sub == NULL) {
-          tl->sub = makeSub();
-          tl->sub->number = tl->son->ID;
+          tl->sub = leaf_node(tl->son->ID);
           break;
         }
         /* Son is leaf, daughter is good */
         else {
-          tl->sub = makeSub();
-          tl->sub->time = tl->Time;
-          tl->sub->left = makeSub();
-          tl->sub->left->number = tl->son->ID;
-          tl->sub->right = tl->daughter->sub;
+          tl->sub = coalesence_node(tl->Time, leaf_node(tl->son->ID), tl->daughter->sub);
           n--;
           break;
         }
@@ -288,17 +271,12 @@ static REALTREE *makeOneTree(double p)
       if (tl->daughter->indegree == 0) {
         /* Daughter is leaf, son is bad */
         if (tl->son->sub == NULL) {
-          tl->sub = makeSub();
-          tl->sub->number = tl->daughter->ID;
+          tl->sub = leaf_node(tl->daughter->ID);
           break;
         }
         /* Daughter is leaf, son is good  */
         else {
-          tl->sub = makeSub();
-          tl->sub->time = tl->Time;
-          tl->sub->right = makeSub();
-          tl->sub->right->number = tl->daughter->ID;
-          tl->sub->left = tl->son->sub;
+          tl->sub = coalesence_node(tl->Time, tl->son->sub, leaf_node(tl->daughter->ID));
           n--;
           break;
         }
@@ -322,10 +300,7 @@ static REALTREE *makeOneTree(double p)
         }
       }
       /* Both children are good  */
-      tl->sub = makeSub();
-      tl->sub->time = tl->Time;
-      tl->sub->left = tl->son->sub;
-      tl->sub->right = tl->daughter->sub;
+      tl->sub = coalesence_node(tl->Time, tl->son->sub, tl->daughter->sub);
       n--;
       break;
     default:
@@ -337,7 +312,7 @@ static REALTREE *makeOneTree(double p)
       break;
     tl = tl->nextTime;
   }
-  
+
   return tl->sub;
 }
 
