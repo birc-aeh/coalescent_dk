@@ -1,0 +1,11 @@
+#ifndef __sequence_h
+#define __sequence_h
+
+#include "structures.h"
+
+SEQUENCE *newSequence(void);
+void putSequence(SEQUENCE *s);
+
+SEQUENCE *getSomeSequence(void);
+
+#endif
