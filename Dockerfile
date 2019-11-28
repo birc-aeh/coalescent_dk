@@ -1,8 +1,7 @@
 FROM alpine:latest  
 WORKDIR /root/
 RUN apk add --no-cache gcc musl-dev make
-ADD dumb-init.c /root/dumb-init/
-ADD VERSION.h   /root/dumb-init/
+ADD dumb-init /root/dumb-init
 ADD server-side-selection   /root/server-side-selection
 ADD server-side-migration   /root/server-side-migration
 ADD server-side-hudson      /root/server-side-hudson
