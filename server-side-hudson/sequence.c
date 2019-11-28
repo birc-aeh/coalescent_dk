@@ -28,14 +28,8 @@ SEQUENCE *newSequence(void)
 {
   static int ID = 0;
 
-  SEQUENCE *result;
-  result = malloc(sizeof(SEQUENCE));
+  SEQUENCE *result = calloc(1, sizeof(SEQUENCE));
   result->ID = ID++;
-  result->Time = 0.0;
-  result->nextTime = NULL;
-  result->reversed = false;
-  result->x = -1;
-  result->y = -1;
   result->gray = emptyInterval();
   return result;
 }

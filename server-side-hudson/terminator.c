@@ -15,6 +15,7 @@ typedef struct termList {
   struct termList *next,*prev;
 } termList;
 
+/* sorted by z, z indicates time of a recombination event */
 static termList *root;
 static int *terms_with_size;
 static int nterms;
@@ -81,6 +82,7 @@ static termList *find_first_k_one_after(termList *t)
   return t;
 }
 
+/* Intervals that are not fully coalesced to a single MRCA */
 INTERVAL *makeIntervals(void)
 {
   termList *t = root;

@@ -34,10 +34,11 @@ typedef struct SEQUENCE {
   struct SEQUENCE *daughter;
 
   struct SEQUENCE *nextTime;
-  int x,y;
-  bool reversed;
 
+  /* Intervals that have yet to find MRCA according to java code - can that be right? intervals == inverse(gray)? */
   struct INTERVAL *intervals;
+
+  /* Intervals that have already found most recent common ancestor (MRCA) */
   struct INTERVAL *gray;
 } SEQUENCE;
 
