@@ -2,6 +2,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Small class to invoke a CGI-script (GET method only) and collect
@@ -12,18 +13,8 @@ import java.util.*;
 public class CGIConnect 
 {
     /// The URL of the CGI-script
-    static URL url;
+    static String base_url;
     
-    /**
-     * Set the URL of the CGI-script
-     *
-     * @param cgi_url the URL of the script
-     */
-    public static void setScript(URL cgi_url)
-    {
-	url = cgi_url;
-    }
-
     /**
      * Set the URL of the CGI-script
      *
@@ -31,7 +22,7 @@ public class CGIConnect
      */
     public static void setScript(String cgi_url) throws MalformedURLException
     {
-	url = new URL(cgi_url);
+	base_url = cgi_url;
     }
 
     /**
@@ -46,16 +37,11 @@ public class CGIConnect
      */
     public static BufferedReader invoke(String param) throws IOException
     {
-	Socket home = new Socket(url.getHost(), 80);
-	String request;
-
-	BufferedReader res = new BufferedReader(new InputStreamReader(home.getInputStream()));
-	PrintWriter pwr = new PrintWriter(new BufferedWriter(new OutputStreamWriter(home.getOutputStream())));
-
-	request = "GET " + url + "?" + param + "\r\n";
-	pwr.print(request);
-	pwr.flush();
-     
-	return res;
+	URL url = new URL(base_url + "?" + param);
+        HttpsURLConnection conn = (HttpsURLConnection)url.openConnection();
+        InputStream is = conn.getInputStream();
+        InputStreamReader isr = new InputStreamReader(is);
+        BufferedReader br = new BufferedReader(isr);
+	return br;
     }
 }

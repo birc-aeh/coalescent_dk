@@ -32,7 +32,7 @@ public class main extends Frame
 	main m = new main();
 
 	try {
-	    CGIConnect.setScript("http://birc-services.au.dk/coalescent_dk/simulate");
+	    CGIConnect.setScript("https://coalescent.dk/cgi-bin/simulate");
 	} catch (Exception e) {
 	    System.err.println(e);
 	    System.exit(1);

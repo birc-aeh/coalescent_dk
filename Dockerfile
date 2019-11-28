@@ -13,7 +13,7 @@ COPY --from=0 /root/bin/dumb-init /bin/
 COPY --from=0 /root/bin/selection /www/cgi-bin/
 COPY --from=0 /root/bin/migration /www/cgi-bin/
 COPY --from=0 /root/bin/hudson /www/cgi-bin/
-COPY html/* /www/coalescentdk/
+COPY html/* /www/
 COPY simulate /www/cgi-bin/
 EXPOSE 80
 ENTRYPOINT [ "/bin/dumb-init", "--" ]
