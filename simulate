@@ -21,9 +21,9 @@ echo "Content-type: text/plain";
 echo ""
 
 case $command in
+    command=exprate)   exec ./hudson $args r=0;;
     command=hudson)    exec ./hudson $args;;
     command=migrate)   exec ./migration $args;;
-    command=exprate)   exec ./exprate $args;;
     command=selection) exec ./selection $args;;
     *)
         echo "unknown command \"$command\""
