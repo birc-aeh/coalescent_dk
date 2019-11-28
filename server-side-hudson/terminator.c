@@ -26,7 +26,7 @@ int max(int a, int b)
   return a>b ? a:b;
 }
 
-void prependElement(termList *t,double z)
+static void prependElement(termList *t,double z)
 {
   termList *n = malloc(sizeof(termList));
   n->prev = t->prev;
@@ -39,7 +39,7 @@ void prependElement(termList *t,double z)
   nterms++;
 }
 
-void appendElement(termList *t,double z)
+static void appendElement(termList *t,double z)
 {
   termList *n = malloc(sizeof(termList));
   n->next = NULL;
