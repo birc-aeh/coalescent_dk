@@ -181,16 +181,16 @@ void updateCoalescens(double from, double to)
   }
 }
 
-double updateOneK(INTERVAL **last_make)
+bool updateOneK(INTERVAL **last_make)
 {
   if (some_k_became_one) {
     *last_make = makeIntervals();
     intersectAll(*last_make);
     some_k_became_one = false;
-    return 1.0;
+    return true;
   }
   *last_make = NULL;
-  return -1.0;
+  return false;
 }
 
 bool theEnd(void)
