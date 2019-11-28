@@ -10,7 +10,6 @@
 
 extern int num_ini_seq;
 extern int R;
-extern int runs;
 extern int seed;
 
 int main(int argc, char **argv) 
