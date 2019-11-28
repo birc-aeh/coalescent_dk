@@ -8,12 +8,19 @@ int seqs_len = 0;                /* External - next free slot */
 static int seqs_alloc = 0;
 static SEQUENCE **seqs = NULL;
 
+static double computeA(INTERVAL *i)
+{
+  if (i->size==0)
+    return 0.0;
+  return (getYn(i)-getX1(i));
+}
+
 double sumA(void)
 {
   double res = 0.0;
   int i = 0;
   for (; i < seqs_len; i++)
-    res += seqs[i]->A;
+    res += computeA(seqs[i]->intervals);
   return res;
 }
 
@@ -81,7 +88,7 @@ SEQUENCE *getWeightedSequence(void)
   for (i = 0; i < seqs_len; i++)
   {
     SEQUENCE *s = seqs[i];
-    sum += s->A;
+    sum += computeA(s->intervals);
     if (random <= sum)
       return getSequence(i);
   }

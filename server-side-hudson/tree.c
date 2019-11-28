@@ -27,13 +27,6 @@ static bool probCoalescens(double k)
   return (drand48() < (k*(k-1.0))/(k*(k-1.0)+2.0*sumA()));
 }
 
-double computeA(INTERVAL *i)
-{
-  if (i->size==0)
-    return 0.0;
-  return (getYn(i)-getX1(i));
-}
-
 double exponen(double f)
 {
   return -log(drand48())/f;
@@ -74,7 +67,6 @@ void makeCoalescensNode(double time)
   s->son = s1;
   s->daughter = s2;
   s->intervals = unite(s1->intervals,s2->intervals, updateCoalescens);
-  s->A = computeA(s->intervals);
   s->Time = time;
   s->gray = uniteNoTerm(s1->gray,s2->gray);
 
@@ -150,7 +142,6 @@ void makeRecombinationNode(double time)
   r->indegree = 1;
   r->outdegree = 2;
   r->son = s;
-  r->A = s->A;
   r->intervals = copyIntervals(s->intervals);
   r->gray = copyIntervals(s->gray);
   s->father = r;
@@ -195,9 +186,6 @@ void makeRecombinationNode(double time)
   s1->gray = intersectTo(r->gray,P);
   s2->gray = intersectFrom(r->gray,P);
 
-  s1->A = computeA(s1->intervals);
-  s2->A = computeA(s2->intervals);
-
   putSequence(s1);
   putSequence(s2);
 
@@ -237,7 +225,6 @@ void build(void)
 
   for (i=0; i<num_ini_seq; i++) {
     s = newSequence();
-    s->A = (double)R/2.0;
     s->indegree = 0;
     s->outdegree = 0;
     s->intervals = initInterval(0,(double)R/2.0);
@@ -278,7 +265,6 @@ INTERVAL *the_intervals;
 void intersectOne(SEQUENCE *s)
 {
   intersect(s->intervals,the_intervals);  
-  s->A = computeA(s->intervals);  
 }
 
 void intersectAll(INTERVAL *i)
